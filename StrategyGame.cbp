@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="StrategyGame" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/StrategyGame" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-g" />
+					<Add directory="include" />
+					<Add directory="C:/i686-w64-mingw32/include/SDL2" />
+				</Compiler>
+				<Linker>
+					<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -std=c++0x" />
+					<Add directory="C:/i686-w64-mingw32/lib" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/StrategyGame" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="include/Camera.h" />
+		<Unit filename="include/Config.h" />
+		<Unit filename="include/Coordinate.h" />
+		<Unit filename="include/Game.h" />
+		<Unit filename="include/Graphics.h" />
+		<Unit filename="include/Inputs.h" />
+		<Unit filename="include/Node.h" />
+		<Unit filename="include/Plains.h" />
+		<Unit filename="include/Tile.h" />
+		<Unit filename="include/Wall.h" />
+		<Unit filename="include/main.h" />
+		<Unit filename="src/Camera.cpp" />
+		<Unit filename="src/Game.cpp" />
+		<Unit filename="src/Graphics.cpp" />
+		<Unit filename="src/Inputs.cpp" />
+		<Unit filename="src/Node.cpp" />
+		<Unit filename="src/Plains.cpp" />
+		<Unit filename="src/Tile.cpp" />
+		<Unit filename="src/Wall.cpp" />
+		<Unit filename="src/main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
