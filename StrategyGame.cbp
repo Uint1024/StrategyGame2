@@ -49,6 +49,7 @@
 		<Unit filename="include/Plains.h" />
 		<Unit filename="include/Tile.h" />
 		<Unit filename="include/Wall.h" />
+		<Unit filename="include/Window.h" />
 		<Unit filename="include/main.h" />
 		<Unit filename="src/Camera.cpp" />
 		<Unit filename="src/Game.cpp" />
@@ -58,6 +59,7 @@
 		<Unit filename="src/Plains.cpp" />
 		<Unit filename="src/Tile.cpp" />
 		<Unit filename="src/Wall.cpp" />
+		<Unit filename="src/Window.cpp" />
 		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />

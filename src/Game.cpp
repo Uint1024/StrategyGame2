@@ -2,6 +2,7 @@
 
 Game::Game() : config_(), graphics_(), world_editor_{Point{10,10}, Dimension{100,100}, true, Color{200,0,0}}
 {
+
     gameLoop();
 }
 
@@ -16,9 +17,14 @@ void Game::gameLoop()
     playing_ = true;
    SDL_Event event;
     Dimension screen_dimension_in_tiles = config_.getScreenSize() / config_.getTileSize();
-
+    Peasant peasant1{Point{20,20}};
+    peasant1.setGoal(Point{10,10});
+    std::vector<DIRECTION> direc = {UP, LEFT, UP_LEFT, UP, UP_RIGHT, RIGHT};
+    //peasant1.setPathfinding(direc);
+    npcs_list_.push_back(peasant1);
     start = {0,0};
     finish = {0,0};
+    chrono_for_pathfinding_test_ = 0;
     for(int x = 0; x < config_.getMapSize().x ; x++ )
     {
         for(int y = 0 ; y < config_.getMapSize().y ; y++)
@@ -29,6 +35,15 @@ void Game::gameLoop()
 
     }
 
+    for(int i = 0 ; i <= 200 ; i++)
+    {
+        for(int j = 0 ; j <= 200 ; j++)
+        {
+            solid_map_[i][j] = false;
+        }
+    }
+
+    elapsed_time_ = SDL_GetTicks();
     while(playing_)
     {
         update(event);
@@ -60,7 +75,6 @@ void Game::update(SDL_Event& event)
 
         case SDL_MOUSEBUTTONDOWN:
             inputs_.mouseButtonDownEvent(event);
-
             break;
 
         case SDL_MOUSEBUTTONUP:
@@ -83,12 +97,12 @@ void Game::update(SDL_Event& event)
 
     if(inputs_.getPressedMouseButtons()[SDL_BUTTON_LEFT])
     {
-        if(mouse_coords.intersect(world_editor_.getRect()))
+        if(mouse_coords.intersect(world_editor_.getRect()) ||
+           inputs_.getLockedWindow() == (&world_editor_))
         {
-            //std::cout << inputs_.getMouseTravel().x << std::endl;
             world_editor_.receiveInputs(inputs_);
         }
-        else if(inputs_.getLockedWindow() != nullptr)
+        else if(inputs_.getLockedWindow() == nullptr)
         {
             auto it = std::find_if(world_map_.begin(), world_map_.end(),
                                     [&mouse_coordinates_in_tiles](const Tile& obj) -> bool
@@ -103,22 +117,30 @@ void Game::update(SDL_Event& event)
                 Wall wallou(mouse_coordinates_in_tiles);
                 world_map_.push_back(wallou);
                 std::cout << "creating wall at" << mouse_coordinates_in_tiles.x << ":" << mouse_coordinates_in_tiles.y << "with type" << wallou.getType() << std::endl;
-                //std::cout << world_map_.size() << std::endl;
+                solid_map_[mouse_coordinates_in_tiles.x][mouse_coordinates_in_tiles.y] = true;
             }
-        }
 
+            /*for(auto npc : npcs_list_)
+            {
+                SDL_Rect rect ={npc.getPosition().x * config_.getTileSize().x + graphics_.getCamera().getPosition().x,
+                                npc.getPosition().y * config_.getTileSize().y + graphics_.getCamera().getPosition().y,
+                                config_.getTileSize().x, config_.getTileSize().y};
+                if(mouse_coords.intersect(rect))
+                {
+                    //std::cout << npc.getGoal().x << std::endl;
+                    std::cout << findPath(npc.getPosition(), npc.getGoal()) << std::endl;
+                }
+            }*/
+        }
     }
 
-    if(inputs_.getPressedMouseButtons()[SDL_BUTTON_RIGHT])
+    if(inputs_.getPressedMouseButtons()[SDL_BUTTON_RIGHT] && npcs_list_[0].getTimeSinceLastOrder() > 300)
     {
-        if(start == Point{0,0})
-            start = Point{mouse_coordinates_in_tiles.x, mouse_coordinates_in_tiles.y};
-        else if (start != Point{mouse_coordinates_in_tiles.x, mouse_coordinates_in_tiles.y})
-        {
-            finish = Point{mouse_coordinates_in_tiles.x, mouse_coordinates_in_tiles.y};
-            std::string pathfound = findPath(start, finish);
-            std::cout << pathfound << std::endl;
-        }
+        npcs_list_[0].setGoal(mouse_coordinates_in_tiles);
+        findPath(npcs_list_[0].getPosition(), npcs_list_[0].getGoal());
+        //std::cout << findPath(npcs_list_[0].getPosition(), npcs_list_[0].getGoal()) << std::endl;
+        //for(int i = 0 ; i < npcs_list_[0].get)
+        npcs_list_[0].setTimeSinceLastOrder();
     }
 
     if(inputs_.getPressedKeys()[SDL_SCANCODE_RIGHT])
@@ -131,8 +153,19 @@ void Game::update(SDL_Event& event)
         graphics_.moveCamera(IVector{0,5});
 
 
+    elapsed_time_ = SDL_GetTicks() - get_ticks_previous_frame_;
+
+    chrono_for_pathfinding_test_ += elapsed_time_;
+    fps_ = 1000/elapsed_time_;
+    get_ticks_previous_frame_ = SDL_GetTicks();
 
 
+    //std::cout << chrono_for_pathfinding_test_ << std::endl;
+    if(chrono_for_pathfinding_test_ > 50)
+    {
+        npcs_list_[0].update();
+        chrono_for_pathfinding_test_ = 0;
+    }
 }
 
 
@@ -141,6 +174,7 @@ void Game::draw(Graphics& graphics, Config& config)
     graphics_.clear();
     graphics_.drawTiles(config, world_map_, pathfinding_nodes_);
     graphics_.drawWindows(world_editor_);
+    graphics_.drawNpcs(config_, npcs_list_);
     graphics_.flip();
 }
 
@@ -149,177 +183,144 @@ void Game::draw(Graphics& graphics, Config& config)
 std::string Game::findPath( const Point start,
                  const Point finish)
 {
-    std::string path = "";
-    std::vector<Node> nodes_map;
-
-    //enum DIRECTION {RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT, UP, UP_RIGHT };
+    static std::priority_queue<Node> pq[2]; // list of open (not-yet-tried) nodes
+    static int pqi; // pq index
+    static Node* n0;
+    static Node* m0;
+    static int i, j, x, y, xdx, ydy;
+    Point new_pos = {0,0};
+    static char c;
     int xMovement[8] = {1, 1, 0, -1, -1, -1, 0, 1};
     int yMovement[8] = {0, 1, 1, 1, 0, -1, -1, -1};
-    int dir_map[config_.getTileSize().x][config_.getTileSize().y];
-
-    static std::priority_queue<Node> priotity_q[2]; // list of open (not-yet-tried) nodes
-    static int priority_q_index; // pq index
-    static Node* node0;
-    static Node* m0;
-    static char c;
-    priority_q_index=0;
-
-    Dimension screen_dimension_in_tiles = config_.getScreenSize() / config_.getTileSize();
-
-    int closed_nodes_map[screen_dimension_in_tiles.x][screen_dimension_in_tiles.y];
-    int open_nodes_map[screen_dimension_in_tiles.x][screen_dimension_in_tiles.y];
+    pqi=0;
 
     // reset the node maps
-    for(int y=0;y<screen_dimension_in_tiles.y;y++)
+    for(y=0;y<200;y++)
     {
-        for(int x=0;x<screen_dimension_in_tiles.x;x++)
+        for(x=0;x<200;x++)
         {
             closed_nodes_map[x][y]=0;
             open_nodes_map[x][y]=0;
         }
     }
 
-
-
     // create the start node and push into list of open nodes
-    node0=new Node(start, 0, 0);
-    node0->calculate_f_score(finish);
-    priotity_q[priority_q_index].push(*node0);
-    //open_nodes_map[x][y]=n0->getPriority(); // mark it on the open nodes map
+    n0=new Node(start, 0, 0);
+    n0->calculate_f_score(finish);
+    pq[pqi].push(*n0);
+    open_nodes_map[x][y]=n0->getFScore(); // mark it on the open nodes map
 
     // A* search
-    while(!priotity_q[priority_q_index].empty())
+    while(!pq[pqi].empty())
     {
         // get the current node w/ the highest priority
         // from the list of open nodes
-        node0=new Node( priotity_q[priority_q_index].top().getPosition(),
-                        priotity_q[priority_q_index].top().getGScore(),
-                        priotity_q[priority_q_index].top().getFScore());
+        n0=new Node( pq[pqi].top().getPosition(),
+                     pq[pqi].top().getGScore(), pq[pqi].top().getFScore());
 
-        //x=n0->getxPos(); y=n0->getyPos();
+        x=n0->getPosition().x; y=n0->getPosition().y;
 
-        priotity_q[priority_q_index].pop(); // remove the node from the open list
-        Point node0_position = node0->getPosition();
-        //open_nodes_map[node0_position.x][node0_position.y]=0;
-
+        pq[pqi].pop(); // remove the node from the open list
+        open_nodes_map[x][y]=0;
         // mark it on the closed nodes map
-        closed_nodes_map[node0_position.x][node0_position.y]=1;
+        closed_nodes_map[x][y]=1;
 
-        auto it = find_if(pathfinding_nodes_.begin(), pathfinding_nodes_.end(), [&node0_position](const Node* node) -> bool{ node0_position == node->getPosition();});
-
-        if(it != pathfinding_nodes_.end())
-        {
-            (*it)->setStatus(2);
-        }
-        else
-        {
-            Node* node_on_path = new Node(node0_position, node0->getGScore(), node0->getFScore());
-            node_on_path->setStatus(2);
-            pathfinding_nodes_.push_back(node_on_path);
-
-        }
-//        pathfinding_nodes_.push_back(n0);
         // quit searching when the goal state is reached
         //if((*n0).estimate(xFinish, yFinish) == 0)
-        if(node0->getPosition() == finish)
+        if(x==finish.x && y==finish.y)
         {
-            std::cout << "path found, ending at " << node0->getPosition().x << ":" << node0->getPosition().y << std::endl;
             // generate the path from finish to start
             // by following the directions
-            //string path="";
-            int x = node0->getPosition().x;
-            int y = node0->getPosition().y;
-            int j;
-            char c;
+            std::string path="";
+            std::vector<DIRECTION> pathfinding_vector;
             while(!(x==start.x && y==start.y))
             {
                 j=dir_map[x][y];
+
                 c='0'+(j+8/2)%8;
                 path=c+path;
-                x+=xMovement[j];
-                y+=xMovement[j];
+                auto it = pathfinding_vector.begin();
+                it = pathfinding_vector.insert(it,static_cast<DIRECTION>((j+4)%8) );
 
-                std::cout << dir_map[x][y] << " at " << x << ":" << y << std::endl;
-                std::cout << path << std::endl;
+                x+=xMovement[j];
+                y+=yMovement[j];
             }
 
             // garbage collection
-            //delete n0;
+            delete n0;
             // empty the leftover nodes
-            while(!priotity_q[priority_q_index].empty()) priotity_q[priority_q_index].pop();
-
+            while(!pq[pqi].empty()) pq[pqi].pop();
+            npcs_list_[0].setPathfinding(pathfinding_vector);
             return path;
         }
-
         // generate moves (child nodes) in all possible directions
-        for(int i=0;i<8;i++)
+        for(i=0;i<8;i++)
         {
+            //xdx=x+xMovement[i]; ydy=y+yMovement[i];
+            new_pos = Point{x+xMovement[i], y+yMovement[i]};
 
-            Point next_position = {node0_position.x + xMovement[i], node0_position.y + yMovement[i]};
+            /*auto wall_position = find_if(world_map_.begin(), world_map_.end(), [&new_pos](const Tile& tile) -> bool
+                                    {
+                                   return (tile.getPosition() == new_pos && tile.getType() == WALL);
+                                   });
+*/
+            //if(wall_position == world_map_.end())
+                //std::cout << "tile at " << new_pos.x << ":" << new_pos.y <<  "isn't a wall, so we proceed" << std::endl;
 
-            if(!(next_position.x<0 || next_position.x>screen_dimension_in_tiles.x-1 ||
-                 next_position.y<0 || next_position.y>screen_dimension_in_tiles.y-1 ||
-                 /*map[next_position.x][ydy]==1  ||*/ closed_nodes_map[next_position.x][next_position.y]==1))
+            if(!(new_pos.x<0 || new_pos.x>199 || new_pos.y<0 || new_pos.y>199 || closed_nodes_map[new_pos.x][new_pos.y]==1) && !solid_map_[new_pos.x][new_pos.y])
             {
+                //std::cout << new_pos.x << ":" << new_pos.y << std::endl;
                 // generate a child node
-                m0=new Node( next_position, node0->getGScore(),
-                             node0->getFScore());
+                m0=new Node( new_pos, n0->getGScore(),
+                             n0->getFScore());
                 m0->calculate_g_score(static_cast<DIRECTION>(i));
                 m0->calculate_f_score(finish);
 
                 // if it is not in the open list then add into that
-                if(open_nodes_map[next_position.x][next_position.y]==0)
+                if(open_nodes_map[new_pos.x][new_pos.y]==0)
                 {
-                    open_nodes_map[next_position.x][next_position.y]=m0->getFScore();
-                    priotity_q[priority_q_index].push(*m0);
-
-                    //m0->setStatus(1);
-                    //pathfinding_nodes_.push_back(m0);
+                    open_nodes_map[new_pos.x][new_pos.y]=m0->getFScore();
+                    pq[pqi].push(*m0);
                     // mark its parent node direction
-                    dir_map[next_position.x][next_position.y]=(i+8/2)%8;
-                    //pathfinding_nodes_.push_back(m0);
-                }
-                //if it's already in the open list but the priority was lower
-                //(ie is was longer to go to this tile through the previous path)
-                else if(open_nodes_map[next_position.x][next_position.y]>m0->getFScore())
-                {
-                    // update the priority info
-                    open_nodes_map[next_position.x][next_position.y]=m0->getFScore();
-                    // update the parent direction info
-                    dir_map[next_position.x][next_position.y]=(i+8/2)%8;
+                    dir_map[new_pos.x][new_pos.y]=(i+8/2)%8;
+                    //std::cout << "new dir = " << dir_map[new_pos.x][new_pos.y] << std::endl;
 
+                }
+                else if(open_nodes_map[new_pos.x][new_pos.y]>m0->getFScore())
+                {
+
+                    // update the priority info
+                    open_nodes_map[new_pos.x][new_pos.y]=m0->getFScore();
+                    // update the parent direction info
+                    dir_map[new_pos.x][new_pos.y]=(i+8/2)%8;
+                    /*std::cout << "tile at " << new_pos.x << ":" << new_pos.y <<
+                    "isn't a wall, and it's in the open list, but it has a higher priority, so we add it and give it direction" <<
+                    dir_map[new_pos.x][new_pos.y] << std::endl;*/
                     // replace the node
                     // by emptying one pq to the other one
                     // except the node to be replaced will be ignored
                     // and the new node will be pushed in instead
-
-                    //while the top node of the current priority queue isn't this node,
-                    //we push the top node from the current queue to the other priority list
-                    //and then remove it from the current list
-                    while(!(priotity_q[priority_q_index].top().getPosition()==next_position))
+                    while(!(pq[pqi].top().getPosition() == new_pos))
                     {
-                        priotity_q[1-priority_q_index].push(priotity_q[priority_q_index].top());
-                        priotity_q[priority_q_index].pop();
+                        pq[1-pqi].push(pq[pqi].top());
+                        pq[pqi].pop();
                     }
-
-                    //and then we remove the node from the current queue (what)
-                    priotity_q[priority_q_index].pop(); // remove the wanted node
+                    pq[pqi].pop(); // remove the wanted node
 
                     // empty the larger size pq to the smaller one
-                    if(priotity_q[priority_q_index].size()>priotity_q[1-priority_q_index].size()) priority_q_index=1-priority_q_index;
-                    while(!priotity_q[priority_q_index].empty())
+                    if(pq[pqi].size()>pq[1-pqi].size()) pqi=1-pqi;
+                    while(!pq[pqi].empty())
                     {
-                        priotity_q[1-priority_q_index].push(priotity_q[priority_q_index].top());
-                        priotity_q[priority_q_index].pop();
+                        pq[1-pqi].push(pq[pqi].top());
+                        pq[pqi].pop();
                     }
-                    priority_q_index=1-priority_q_index;
-                    priotity_q[priority_q_index].push(*m0); // add the better node instead
-                    //pathfinding_nodes_.push_back(m0);
+                    pqi=1-pqi;
+                    pq[pqi].push(*m0); // add the better node instead
                 }
                 else delete m0; // garbage collection
             }
         }
-        delete node0; // garbage collection
+        delete n0; // garbage collection
     }
-    return ""; // no route found*/
+    return ""; // no route found
 }

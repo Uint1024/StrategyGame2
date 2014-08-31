@@ -32,6 +32,15 @@ class Game
         Point finish;
         std::vector<Node*> pathfinding_nodes_;
         Window world_editor_;
+        std::vector<Peasant> npcs_list_;
+        float get_ticks_previous_frame_;
+        float elapsed_time_;
+        float fps_;
+        Uint32 chrono_for_pathfinding_test_;
+        int closed_nodes_map[200][200];
+        int open_nodes_map[200][200];
+        int dir_map[200][200];
+        bool solid_map_[200][200];
 };
 
 #endif // GAME_H

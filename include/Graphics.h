@@ -10,6 +10,7 @@
 #include "Node.h"
 #include "Camera.h"
 #include "Window.h"
+#include "Peasant.h"
 
 class Graphics
 {
@@ -23,6 +24,7 @@ class Graphics
         void moveCamera(const IVector& movement);
         Camera getCamera() const;
         void drawWindows(Window& windo) const;
+        void drawNpcs(Config& config, std::vector<Peasant>& npcs_list) const;
     protected:
     private:
         SDL_Window* sdl_window_;

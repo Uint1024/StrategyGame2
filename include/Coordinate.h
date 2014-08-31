@@ -7,6 +7,9 @@ enum DIRECTION {RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT, UP, UP_RIGHT 
 //enum DIRECTION_X {RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT, UP, UP_RIGHT };
 //enum DIRECTIO_Y {RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT, UP, UP_RIGHT };
 
+    //int xMovement[8] = {1, 1, 0, -1, -1, -1, 0, 1};
+    //int yMovement[8] = {0, 1, 1, 1, 0, -1, -1, -1};
+
 struct Color
 {
     int r;

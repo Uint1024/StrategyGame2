@@ -23,24 +23,25 @@ void Inputs::keyUpEvent(const SDL_Event& event)
 
 void Inputs::mouseButtonDownEvent(const SDL_Event& event)
 {
-    //mouse_travel_ = Point{event.button.x, event.button.y} - mouse_coordinates_in_pixels;
+    if(event.button.button == SDL_BUTTON_RIGHT)
+        last_right_click_ = SDL_GetTicks();
+
     pressed_mouse_buttons_[event.button.button] = true;
 
 }
 
+void Inputs::mouseMotionEvent(const SDL_Event& event) {}
 void Inputs::mouseButtonUpEvent(const SDL_Event& event)
 {
     pressed_mouse_buttons_[event.button.button] = false;
-    std::cout << "released key " << event.button.button << std::endl;
+    held_mouse_buttons[event.button.button] = false;
     cursor_locked_on_ = nullptr;
 }
 
-void Inputs::mouseMotionEvent(const SDL_Event& event)
+float Inputs::getTimeSinceLastRightClick() const
 {
-   // mouse_travel_ = Point{event.button.x, event.button.y} - mouse_coordinates_in_pixels;
-
-    //mouse_coordinates_in_pixels = {event.motion.x, event.motion.y};
-    //mouse_coordinates_in_pixels = {event.motion.x, event.motion.y};
+    //std::cout << SDL_GetTicks() - last_right_click_ << std::endl;
+    return (SDL_GetTicks() - last_right_click_);
 }
 
 void Inputs::mouseIsImmobile() { mouse_travel_ = Point{0,0};}
@@ -53,7 +54,7 @@ void Inputs::calculateMouseTravel(const SDL_Event& event)
 }
 
 Window* Inputs::getLockedWindow() const { return cursor_locked_on_; }
-void Inputs::setLockedWindow(Window* windo) { cursor_locked_on_ = windo; std::cout << "wow" << std::endl; }
+void Inputs::setLockedWindow(Window* windo) { cursor_locked_on_ = windo;}
 Point Inputs::getMouseCoordinatesInPixels() const { return mouse_coordinates_in_pixels; }
 std::map<SDL_Scancode, bool> Inputs::getPressedKeys() const { return pressed_keys_; }
 std::map<int, bool> Inputs::getPressedMouseButtons() const { return pressed_mouse_buttons_; }

@@ -71,6 +71,23 @@ void Graphics::drawWindows(Window& windo) const
     delete rect;
 }
 
+void Graphics::drawNpcs(Config& config, std::vector<Peasant>& npcs_list) const
+{
+    SDL_SetRenderDrawColor(sdl_renderer_, 0xAA, 0x0F, 0xAA, 0xFF);
+
+    for(auto npc : npcs_list)
+    {
+        Point tile_position = npc.getPosition() * config.getTileSize() - camera_.getPosition();
+        SDL_Rect* tile_rect = new SDL_Rect{ tile_position.x,
+                                            tile_position.y,
+                                            config.getTileSize().x,
+                                            config.getTileSize().y};
+        SDL_RenderFillRect(sdl_renderer_, tile_rect);
+
+        delete tile_rect;
+    }
+}
+
 void Graphics::clear()
 {
     SDL_SetRenderDrawColor(sdl_renderer_, 0xFF, 0xFF, 0xAA, 0xFF);

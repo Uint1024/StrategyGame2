@@ -414,13 +414,13 @@
 	"Coordinate.h"
 	<iostream>
 
-1409445492 c:\users\john\documents\github\strategygame\include\coordinate.h
+1409488140 c:\users\john\documents\github\strategygame\include\coordinate.h
 	<SDL.h>
 
-1409447630 source:c:\users\john\documents\github\strategygame\src\game.cpp
+1409503418 source:c:\users\john\documents\github\strategygame\src\game.cpp
 	"Game.h"
 
-1409442883 c:\users\john\documents\github\strategygame\include\game.h
+1409503245 c:\users\john\documents\github\strategygame\include\game.h
 	<SDL.h>
 	"Graphics.h"
 	"Inputs.h"
@@ -433,7 +433,7 @@
 	"Plains.h"
 	"Window.h"
 
-1409444471 c:\users\john\documents\github\strategygame\include\graphics.h
+1409485172 c:\users\john\documents\github\strategygame\include\graphics.h
 	<SDL.h>
 	<iostream>
 	<vector>
@@ -443,23 +443,26 @@
 	"Node.h"
 	"Camera.h"
 	"Window.h"
+	"Peasant.h"
 
 1409438302 c:\users\john\documents\github\strategygame\include\config.h
 
-1409422010 c:\users\john\documents\github\strategygame\include\tile.h
+1409495658 c:\users\john\documents\github\strategygame\include\tile.h
 	"Coordinate.h"
 	<SDL.h>
+	"Entity.h"
 
 1409424616 c:\users\john\documents\github\strategygame\include\node.h
 	<SDL.h>
 	<math.h>
 	"Tile.h"
 
-1409447592 c:\users\john\documents\github\strategygame\include\inputs.h
+1409499140 c:\users\john\documents\github\strategygame\include\inputs.h
 	<SDL.h>
 	<iostream>
 	<map>
 	"Coordinate.h"
+	"Peasant.h"
 
 1409406195 c:\users\john\documents\github\strategygame\include\wall.h
 	"Coordinate.h"
@@ -469,10 +472,10 @@
 	"Tile.h"
 	<SDL.h>
 
-1409445034 source:c:\users\john\documents\github\strategygame\src\graphics.cpp
+1409495313 source:c:\users\john\documents\github\strategygame\src\graphics.cpp
 	"Graphics.h"
 
-1409447094 source:c:\users\john\documents\github\strategygame\src\inputs.cpp
+1409499551 source:c:\users\john\documents\github\strategygame\src\inputs.cpp
 	"Inputs.h"
 
 1409406016 source:c:\users\john\documents\github\strategygame\src\main.cpp
@@ -493,7 +496,7 @@
 1409421935 source:c:\users\john\documents\github\strategygame\src\plains.cpp
 	"Plains.h"
 
-1409422018 source:c:\users\john\documents\github\strategygame\src\tile.cpp
+1409495648 source:c:\users\john\documents\github\strategygame\src\tile.cpp
 	"Tile.h"
 
 1409406598 source:c:\users\john\documents\github\strategygame\src\wall.cpp
@@ -505,4 +508,19 @@
 
 1409447516 source:c:\users\john\documents\github\strategygame\src\window.cpp
 	"Window.h"
+
+1409485812 c:\users\john\documents\github\strategygame\include\entity.h
+	"Coordinate.h"
+
+1409485899 source:c:\users\john\documents\github\strategygame\src\entity.cpp
+	"Entity.h"
+
+1409499605 source:c:\users\john\documents\github\strategygame\src\peasant.cpp
+	"Peasant.h"
+
+1409499598 c:\users\john\documents\github\strategygame\include\peasant.h
+	<vector>
+	"Entity.h"
+	"Coordinate.h"
+	"Tile.h"
 
