@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game() : config_(), graphics_()
+Game::Game() : config_(), graphics_(), world_editor_{Point{10,10}, Dimension{100,100}, true, Color{200,0,0}}
 {
     gameLoop();
 }
@@ -40,6 +40,8 @@ void Game::gameLoop()
 
 void Game::update(SDL_Event& event)
 {
+    //inputs_.mouseIsImmobile();
+    inputs_.calculateMouseTravel(event);
     while(SDL_PollEvent(&event))
     {
         switch(event.type)
@@ -58,6 +60,7 @@ void Game::update(SDL_Event& event)
 
         case SDL_MOUSEBUTTONDOWN:
             inputs_.mouseButtonDownEvent(event);
+
             break;
 
         case SDL_MOUSEBUTTONUP:
@@ -71,39 +74,43 @@ void Game::update(SDL_Event& event)
         default:
             break;
         }
+
     }
+
+    Point mouse_coords = inputs_.getMouseCoordinatesInPixels() + graphics_.getCamera().getPosition();
+    Point mouse_coordinates_in_tiles;
+    mouse_coordinates_in_tiles = (mouse_coords - (mouse_coords % config_.getTileSize()))/ config_.getTileSize();
 
     if(inputs_.getPressedMouseButtons()[SDL_BUTTON_LEFT])
     {
-
-        Point mouse_coords = inputs_.getMouseCoordinatesInPixels() + graphics_.getCamera().getPosition();
-        Point mouse_coordinates_in_tiles;
-        mouse_coordinates_in_tiles = (mouse_coords - (mouse_coords % config_.getTileSize()))/ config_.getTileSize();
-
-        auto it = std::find_if(world_map_.begin(), world_map_.end(),
-                                [&mouse_coordinates_in_tiles](const Tile& obj) -> bool
-                                {
-                                    (mouse_coordinates_in_tiles == obj.getPosition());
-                                });
-
-        if((*it).getType() != WALL)
+        if(mouse_coords.intersect(world_editor_.getRect()))
         {
-            world_map_.erase(it);
-
-            Wall wallou(mouse_coordinates_in_tiles);
-            world_map_.push_back(wallou);
-            std::cout << "creating wall at" << mouse_coordinates_in_tiles.x << ":" << mouse_coordinates_in_tiles.y << "with type" << wallou.getType() << std::endl;
-            //std::cout << world_map_.size() << std::endl;
+            //std::cout << inputs_.getMouseTravel().x << std::endl;
+            world_editor_.receiveInputs(inputs_);
         }
+        else if(inputs_.getLockedWindow() != nullptr)
+        {
+            auto it = std::find_if(world_map_.begin(), world_map_.end(),
+                                    [&mouse_coordinates_in_tiles](const Tile& obj) -> bool
+                                    {
+                                        (mouse_coordinates_in_tiles == obj.getPosition());
+                                    });
 
+            if((*it).getType() != WALL)
+            {
+                world_map_.erase(it);
+
+                Wall wallou(mouse_coordinates_in_tiles);
+                world_map_.push_back(wallou);
+                std::cout << "creating wall at" << mouse_coordinates_in_tiles.x << ":" << mouse_coordinates_in_tiles.y << "with type" << wallou.getType() << std::endl;
+                //std::cout << world_map_.size() << std::endl;
+            }
+        }
 
     }
 
     if(inputs_.getPressedMouseButtons()[SDL_BUTTON_RIGHT])
     {
-        Point mouse_coords = inputs_.getMouseCoordinatesInPixels();
-        Point mouse_coordinates_in_tiles;
-        mouse_coordinates_in_tiles = (mouse_coords - (mouse_coords % config_.getTileSize()))/ config_.getTileSize();
         if(start == Point{0,0})
             start = Point{mouse_coordinates_in_tiles.x, mouse_coordinates_in_tiles.y};
         else if (start != Point{mouse_coordinates_in_tiles.x, mouse_coordinates_in_tiles.y})
@@ -123,6 +130,9 @@ void Game::update(SDL_Event& event)
     if(inputs_.getPressedKeys()[SDL_SCANCODE_DOWN])
         graphics_.moveCamera(IVector{0,5});
 
+
+
+
 }
 
 
@@ -130,6 +140,7 @@ void Game::draw(Graphics& graphics, Config& config)
 {
     graphics_.clear();
     graphics_.drawTiles(config, world_map_, pathfinding_nodes_);
+    graphics_.drawWindows(world_editor_);
     graphics_.flip();
 }
 

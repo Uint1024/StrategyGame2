@@ -10,7 +10,7 @@
 #include <queue>
 #include "Node.h"
 #include "Plains.h"
-
+#include "Window.h"
 class Game
 {
     public:
@@ -31,6 +31,7 @@ class Game
         Point start;
         Point finish;
         std::vector<Node*> pathfinding_nodes_;
+        Window world_editor_;
 };
 
 #endif // GAME_H

@@ -9,6 +9,7 @@
 #include "tile.h"
 #include "Node.h"
 #include "Camera.h"
+#include "Window.h"
 
 class Graphics
 {
@@ -21,6 +22,7 @@ class Graphics
         void drawTiles(Config& config, std::vector<Tile>& world_map, std::vector<Node*>& pathfinding_nodes);
         void moveCamera(const IVector& movement);
         Camera getCamera() const;
+        void drawWindows(Window& windo) const;
     protected:
     private:
         SDL_Window* sdl_window_;

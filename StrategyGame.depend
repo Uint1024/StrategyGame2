@@ -406,3 +406,103 @@
 	"Coordinate.h"
 	<iostream>
 
+1409437498 source:c:\users\john\documents\github\strategygame\src\camera.cpp
+	"Camera.h"
+
+1409437522 c:\users\john\documents\github\strategygame\include\camera.h
+	<SDL.h>
+	"Coordinate.h"
+	<iostream>
+
+1409445492 c:\users\john\documents\github\strategygame\include\coordinate.h
+	<SDL.h>
+
+1409447630 source:c:\users\john\documents\github\strategygame\src\game.cpp
+	"Game.h"
+
+1409442883 c:\users\john\documents\github\strategygame\include\game.h
+	<SDL.h>
+	"Graphics.h"
+	"Inputs.h"
+	"Tile.h"
+	"Wall.h"
+	<vector>
+	<algorithm>
+	<queue>
+	"Node.h"
+	"Plains.h"
+	"Window.h"
+
+1409444471 c:\users\john\documents\github\strategygame\include\graphics.h
+	<SDL.h>
+	<iostream>
+	<vector>
+	"Coordinate.h"
+	"Config.h"
+	"tile.h"
+	"Node.h"
+	"Camera.h"
+	"Window.h"
+
+1409438302 c:\users\john\documents\github\strategygame\include\config.h
+
+1409422010 c:\users\john\documents\github\strategygame\include\tile.h
+	"Coordinate.h"
+	<SDL.h>
+
+1409424616 c:\users\john\documents\github\strategygame\include\node.h
+	<SDL.h>
+	<math.h>
+	"Tile.h"
+
+1409447592 c:\users\john\documents\github\strategygame\include\inputs.h
+	<SDL.h>
+	<iostream>
+	<map>
+	"Coordinate.h"
+
+1409406195 c:\users\john\documents\github\strategygame\include\wall.h
+	"Coordinate.h"
+	"Tile.h"
+
+1409421926 c:\users\john\documents\github\strategygame\include\plains.h
+	"Tile.h"
+	<SDL.h>
+
+1409445034 source:c:\users\john\documents\github\strategygame\src\graphics.cpp
+	"Graphics.h"
+
+1409447094 source:c:\users\john\documents\github\strategygame\src\inputs.cpp
+	"Inputs.h"
+
+1409406016 source:c:\users\john\documents\github\strategygame\src\main.cpp
+	<SDL.h>
+	<iostream>
+	<stdio.h>
+	"main.h"
+	"Graphics.h"
+	"Coordinate.h"
+	"Game.h"
+
+1409358159 c:\users\john\documents\github\strategygame\include\main.h
+	"graphics.h"
+
+1409424661 source:c:\users\john\documents\github\strategygame\src\node.cpp
+	"Node.h"
+
+1409421935 source:c:\users\john\documents\github\strategygame\src\plains.cpp
+	"Plains.h"
+
+1409422018 source:c:\users\john\documents\github\strategygame\src\tile.cpp
+	"Tile.h"
+
+1409406598 source:c:\users\john\documents\github\strategygame\src\wall.cpp
+	"Wall.h"
+
+1409445895 c:\users\john\documents\github\strategygame\include\window.h
+	"Coordinate.h"
+	"Inputs.h"
+
+1409447516 source:c:\users\john\documents\github\strategygame\src\window.cpp
+	"Window.h"
+

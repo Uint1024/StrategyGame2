@@ -44,6 +44,8 @@ void Graphics::drawTiles(Config& config, std::vector<Tile>& world_map, std::vect
                                                 config.getTileSize().x,
                                                 config.getTileSize().y};
             SDL_RenderFillRect(sdl_renderer_, tile_rect);
+
+            delete tile_rect;
         }
     }
 
@@ -58,6 +60,16 @@ void Graphics::drawTiles(Config& config, std::vector<Tile>& world_map, std::vect
     }
 }
 
+void Graphics::drawWindows(Window& windo) const
+{
+    Color color = windo.getColor();
+    SDL_SetRenderDrawColor(sdl_renderer_, color.r, color.g, color.b, 0xFF);
+
+    SDL_Rect* rect = new SDL_Rect{windo.getPosition().x, windo.getPosition().y, windo.getSize().x, windo.getSize().y};
+    SDL_RenderFillRect(sdl_renderer_, rect);
+
+    delete rect;
+}
 
 void Graphics::clear()
 {
