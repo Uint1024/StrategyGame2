@@ -6,7 +6,7 @@
 class Tile : public Entity
 {
     public:
-        Tile(Point position, bool solid, TILE_TYPE type);
+        Tile(Point position, bool solid, TILE_TYPE type, std::string texture_name);
         virtual ~Tile();
         //Point getPosition() const;
         TILE_TYPE getType() const;

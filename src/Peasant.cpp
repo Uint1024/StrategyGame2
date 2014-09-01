@@ -1,6 +1,6 @@
 #include "Peasant.h"
 
-Peasant::Peasant(Point position) : Entity(position, Dimension{20,20}), goal_(position)
+Peasant::Peasant(Point position) : Entity(position, Dimension{20,20}, "peasant.png"), goal_(position)
 {
 position_in_pathfinding_ = 0;
 time_of_last_order_ = 0;
@@ -98,16 +98,48 @@ Point Peasant::getNextPosition() const {return next_position_; }
 void Peasant::setGoal(const Point& goal) { goal_ = goal;}
 void Peasant::noGoal() {
     goal_ = position_;
+
     random_goals_tried = 0;
-    };
+};
+
 void Peasant::newRandomGoal()
 {
-    random_goals_tried += 1;
     int xMovement[8] = {1, 1, 0, -1, -1, -1, 0, 1};
     int yMovement[8] = {0, 1, 1, 1, 0, -1, -1, -1};
-    int random_direction = rand() % 8;
+    DIRECTION position_to_goal_;
+    random_goals_tried += 1;
 
-    goal_ = goal_ + Point{xMovement[random_direction],yMovement[random_direction]};
+
+    if(position_.x > goal_.x)
+    {
+        if(position_.y > goal_.y)
+            position_to_goal_ = DOWN_RIGHT;
+        if(position_.y < goal_.y)
+            position_to_goal_ = UP_RIGHT;
+        if(position_.y == goal_.y)
+            position_to_goal_ = RIGHT;
+    }
+    else if(position_.x == goal_.x)
+    {
+        if(position_.y > goal_.y)
+            position_to_goal_ = DOWN;
+        if(position_.y < goal_.y)
+            position_to_goal_ = UP;
+    }
+    else if(position_.x < goal_.x)
+    {
+        if(position_.y > goal_.y)
+            position_to_goal_ = DOWN_LEFT;
+        if(position_.y < goal_.y)
+            position_to_goal_ = UP_LEFT;
+        if(position_.y == goal_.y)
+            position_to_goal_ = LEFT;
+
+    }
+
+    std::cout << random_goals_tried << std::endl;
+
+    goal_ = goal_ + Point{xMovement[position_to_goal_],yMovement[position_to_goal_]};
 }
 
 int Peasant::getRandomGoalsTried()

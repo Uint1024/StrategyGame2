@@ -31,7 +31,7 @@ class Game
         Point start;
         Point finish;
         std::vector<Node*> pathfinding_nodes_;
-        Window world_editor_;
+        Window* world_editor_;
         std::vector<Peasant> npcs_list_;
         float get_ticks_previous_frame_;
         float elapsed_time_;
@@ -48,6 +48,8 @@ class Game
         float path_finding_time_last_frame;
         int searched_tiles;
         float last_time_npc_creation_;
+        Peasant* selected_npc_;
+        TILE_TYPE current_selected_world_editor_object_;
 
 };
 

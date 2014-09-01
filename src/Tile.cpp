@@ -1,6 +1,6 @@
 #include "Tile.h"
 
-Tile::Tile(Point position,  bool solid, TILE_TYPE type) : Entity(position, Dimension{20,20}), solid_(solid), type_(type)
+Tile::Tile(Point position,  bool solid, TILE_TYPE type, std::string texture_name) : Entity(position, Dimension{20,20}, texture_name), solid_(solid), type_(type)
 {
     //ctor
 }

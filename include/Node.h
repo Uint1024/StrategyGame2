@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 #include <math.h>
+#include <cstdlib>
 #include "Tile.h"
 /*Node for the pathfinding algorithm*/
 
@@ -17,7 +18,7 @@ class Node : public Tile
         Uint8 getNodeStatus() const;
         void calculate_f_score(const Point& destination);
         void calculate_g_score(const DIRECTION dire);
-        const int calculate_distance_to_goal(const Point& destination) const;
+        const float calculate_distance_to_goal(const Point& destination) const;
         void setStatus(const Uint8 status);
         Uint8 getStatus() const;
     protected:

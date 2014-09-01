@@ -3,6 +3,8 @@
 
 #include "Coordinate.h"
 #include "Inputs.h"
+#include "Icon.h"
+class graphics;
 class Window
 {
     public:
@@ -15,6 +17,7 @@ class Window
         Color getColor() const;
         SDL_Rect getRect() const;
         void receiveInputs(Inputs& inputs);
+        void render(Graphics& graphics);
 
     protected:
         Point position_;
@@ -23,6 +26,7 @@ class Window
         bool visible_;
         Color color_;
         SDL_Rect rect_;
+        std::vector<Icon> icons_list_;
     private:
 
 };

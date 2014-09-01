@@ -1,6 +1,8 @@
 #include "Entity.h"
+#include "Graphics.h"
+#include "Config.h"
 
-Entity::Entity(Point position, Dimension size) : position_(position), size_(size)
+Entity::Entity(Point position, Dimension size, std::string texture_name) : position_(position), size_(size), texture_name_(texture_name)
 {
     //ctor
 }
@@ -11,4 +13,11 @@ Entity::~Entity()
 }
 
 Point Entity::getPosition() const   { return position_; }
-SDL_Rect Entity::getRect() const    { return SDL_Rect{position_.x, position_.y, size_.x, size_.y};}
+SDL_Rect Entity::getRect(Graphics& graphics_, Config& config_) const
+{
+    return SDL_Rect{position_.x * config_.getTileSize().x - graphics_.getCamera().getPosition().x,
+                    position_.y * config_.getTileSize().y - graphics_.getCamera().getPosition().y,
+                    size_.x,
+                    size_.y};
+}
+std::string Entity::getTextureName() const { return texture_name_;}

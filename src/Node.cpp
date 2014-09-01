@@ -1,6 +1,6 @@
 #include "Node.h"
 
-Node::Node(Point position, Uint16 g_score, Uint16 f_score) : Tile(position, false, NODE), g_score_(g_score), f_score_(f_score)
+Node::Node(Point position, Uint16 g_score, Uint16 f_score) : Tile(position, false, NODE, "node.png"), g_score_(g_score), f_score_(f_score)
 {
     //ctor
 }
@@ -22,14 +22,20 @@ void Node::calculate_g_score(const DIRECTION dire)
 }
 
 
-const int Node::calculate_distance_to_goal(const Point& destination) const
+const float Node::calculate_distance_to_goal(const Point& destination) const
 {
 
-    Point difference = destination - position_;
+    Point difference;
+
+    difference.x = std::abs(position_.x - destination.x);
+    difference.y = std::abs(position_.y - destination.y);
 
     //(c² = a² + b²)
-    int distance=static_cast<int>(sqrt(difference.x * difference.x + difference.y * difference.y));
+    //int distance=static_cast<int>(sqrt(difference.x * difference.x + difference.y * difference.y));
 
+    //Chebyshev distance
+    float distance = (difference.x + difference.y) + (1.41f - 2) * std::min(difference.x, difference.y);
+    //std::cout << distance << std::endl;
     return(distance);
 }
 
