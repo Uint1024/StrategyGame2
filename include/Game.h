@@ -20,7 +20,7 @@ class Game
         void update(SDL_Event& event);
         void draw(Graphics& graphics, Config& config);
         void receiveInputs(SDL_Event& event);
-        std::string findPath(const Point start, const Point finish);
+        bool findPath(Peasant& peasant);
     protected:
     private:
         Graphics graphics_;
@@ -36,11 +36,19 @@ class Game
         float get_ticks_previous_frame_;
         float elapsed_time_;
         float fps_;
-        Uint32 chrono_for_pathfinding_test_;
-        int closed_nodes_map[200][200];
-        int open_nodes_map[200][200];
-        int dir_map[200][200];
-        bool solid_map_[200][200];
+        Uint32 chrono_for_pathfinding_;
+        Uint32 chrono_movement_;
+        //int closed_nodes_map[200][200];
+        //int vector<int> closed_nodes_map_;
+        //int open_nodes_map[200][200];
+        //int dir_map[200][200];
+        //bool solid_map_[200][200];
+        std::vector<bool> solid_map_;
+        float path_finding_elapsed_time; //don't search for more than 1/4th of a second
+        float path_finding_time_last_frame;
+        int searched_tiles;
+        float last_time_npc_creation_;
+
 };
 
 #endif // GAME_H

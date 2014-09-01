@@ -406,7 +406,7 @@
 	"Coordinate.h"
 	<iostream>
 
-1409437498 source:c:\users\john\documents\github\strategygame\src\camera.cpp
+1409517727 source:c:\users\john\documents\github\strategygame\src\camera.cpp
 	"Camera.h"
 
 1409437522 c:\users\john\documents\github\strategygame\include\camera.h
@@ -417,10 +417,10 @@
 1409488140 c:\users\john\documents\github\strategygame\include\coordinate.h
 	<SDL.h>
 
-1409503418 source:c:\users\john\documents\github\strategygame\src\game.cpp
+1409535126 source:c:\users\john\documents\github\strategygame\src\game.cpp
 	"Game.h"
 
-1409503245 c:\users\john\documents\github\strategygame\include\game.h
+1409534621 c:\users\john\documents\github\strategygame\include\game.h
 	<SDL.h>
 	"Graphics.h"
 	"Inputs.h"
@@ -433,7 +433,7 @@
 	"Plains.h"
 	"Window.h"
 
-1409485172 c:\users\john\documents\github\strategygame\include\graphics.h
+1409515402 c:\users\john\documents\github\strategygame\include\graphics.h
 	<SDL.h>
 	<iostream>
 	<vector>
@@ -445,7 +445,7 @@
 	"Window.h"
 	"Peasant.h"
 
-1409438302 c:\users\john\documents\github\strategygame\include\config.h
+1409533803 c:\users\john\documents\github\strategygame\include\config.h
 
 1409495658 c:\users\john\documents\github\strategygame\include\tile.h
 	"Coordinate.h"
@@ -457,7 +457,7 @@
 	<math.h>
 	"Tile.h"
 
-1409499140 c:\users\john\documents\github\strategygame\include\inputs.h
+1409522648 c:\users\john\documents\github\strategygame\include\inputs.h
 	<SDL.h>
 	<iostream>
 	<map>
@@ -472,13 +472,13 @@
 	"Tile.h"
 	<SDL.h>
 
-1409495313 source:c:\users\john\documents\github\strategygame\src\graphics.cpp
+1409534893 source:c:\users\john\documents\github\strategygame\src\graphics.cpp
 	"Graphics.h"
 
-1409499551 source:c:\users\john\documents\github\strategygame\src\inputs.cpp
+1409522542 source:c:\users\john\documents\github\strategygame\src\inputs.cpp
 	"Inputs.h"
 
-1409406016 source:c:\users\john\documents\github\strategygame\src\main.cpp
+1409528759 source:c:\users\john\documents\github\strategygame\src\main.cpp
 	<SDL.h>
 	<iostream>
 	<stdio.h>
@@ -486,11 +486,12 @@
 	"Graphics.h"
 	"Coordinate.h"
 	"Game.h"
+	"time.h"
 
 1409358159 c:\users\john\documents\github\strategygame\include\main.h
 	"graphics.h"
 
-1409424661 source:c:\users\john\documents\github\strategygame\src\node.cpp
+1409514098 source:c:\users\john\documents\github\strategygame\src\node.cpp
 	"Node.h"
 
 1409421935 source:c:\users\john\documents\github\strategygame\src\plains.cpp
@@ -515,12 +516,14 @@
 1409485899 source:c:\users\john\documents\github\strategygame\src\entity.cpp
 	"Entity.h"
 
-1409499605 source:c:\users\john\documents\github\strategygame\src\peasant.cpp
+1409529223 source:c:\users\john\documents\github\strategygame\src\peasant.cpp
 	"Peasant.h"
 
-1409499598 c:\users\john\documents\github\strategygame\include\peasant.h
+1409529123 c:\users\john\documents\github\strategygame\include\peasant.h
 	<vector>
+	<iostream>
 	"Entity.h"
 	"Coordinate.h"
 	"Tile.h"
+	"time.h"
 

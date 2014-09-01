@@ -24,14 +24,14 @@ void Graphics::drawTiles(Config& config, std::vector<Tile>& world_map, std::vect
     SDL_SetRenderDrawColor(sdl_renderer_, 0x00, 0x00, 0x00, 0xFF);
 
     //TODO : set a real size for the map...
-    for(int x = 0 ; x < 2000 ; x += config.getTileSize().x)
+    for(int x = 0 ; x < config.getMapSize().x ; x++)
     {
-        SDL_RenderDrawLine(sdl_renderer_, x - camera_.getPosition().x, 0, x - camera_.getPosition().x, window_size_.y);
+        SDL_RenderDrawLine(sdl_renderer_, x * config.getTileSize().x - camera_.getPosition().x, 0, x * config.getTileSize().x - camera_.getPosition().x, window_size_.y);
     }
 
-    for(int y = 0 ; y < 2000 ; y += config.getTileSize().y)
+    for(int y = 0 ; y < config.getMapSize().y ; y ++)
     {
-        SDL_RenderDrawLine(sdl_renderer_, 0, y - camera_.getPosition().y, window_size_.x, y  - camera_.getPosition().y);
+        SDL_RenderDrawLine(sdl_renderer_, 0, y * config.getTileSize().y - camera_.getPosition().y, window_size_.x, y * config.getTileSize().y - camera_.getPosition().y);
     }
 
     for(auto tile : world_map)
@@ -71,12 +71,31 @@ void Graphics::drawWindows(Window& windo) const
     delete rect;
 }
 
+void Graphics::drawNodes(int (&open_nodes_map)[200][200], int (&closed_nodes_map)[200][200])
+{
+    /*SDL_SetRenderDrawColor(sdl_renderer_, 0x00, 0xFF, 0xAA, 0xFF);
+    for(int i = 0 ; i < 200 ; i++)
+    {
+        for(int j = 0 ; j < 200 ; j++)
+        {
+            if(open_nodes_map[i][j] == 1)
+            {
+                 SDL_Rect* rect = new SDL_Rect{i * 20 - camera_.getPosition().x, j * 20 - camera_.getPosition().y, 5, 5};
+                 SDL_RenderFillRect(sdl_renderer_, rect);
+
+                delete rect;
+            }
+
+        }
+    }*/
+}
 void Graphics::drawNpcs(Config& config, std::vector<Peasant>& npcs_list) const
 {
-    SDL_SetRenderDrawColor(sdl_renderer_, 0xAA, 0x0F, 0xAA, 0xFF);
+
 
     for(auto npc : npcs_list)
     {
+        SDL_SetRenderDrawColor(sdl_renderer_, 0xAA, 0x0F, 0xAA, 0xFF);
         Point tile_position = npc.getPosition() * config.getTileSize() - camera_.getPosition();
         SDL_Rect* tile_rect = new SDL_Rect{ tile_position.x,
                                             tile_position.y,
@@ -85,7 +104,23 @@ void Graphics::drawNpcs(Config& config, std::vector<Peasant>& npcs_list) const
         SDL_RenderFillRect(sdl_renderer_, tile_rect);
 
         delete tile_rect;
+
+        if(npc.getGoal() != npc.getPosition())
+        {
+            SDL_SetRenderDrawColor(sdl_renderer_, 0xFF, 0x0F, 0x00, 0xFF);
+            tile_position = npc.getGoal() * config.getTileSize() - camera_.getPosition();
+            tile_rect = new SDL_Rect{ tile_position.x,
+                                                tile_position.y,
+                                                config.getTileSize().x,
+                                                config.getTileSize().y};
+            SDL_RenderFillRect(sdl_renderer_, tile_rect);
+
+            delete tile_rect;
+        }
+
     }
+
+
 }
 
 void Graphics::clear()

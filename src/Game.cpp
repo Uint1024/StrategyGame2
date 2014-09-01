@@ -24,7 +24,17 @@ void Game::gameLoop()
     npcs_list_.push_back(peasant1);
     start = {0,0};
     finish = {0,0};
-    chrono_for_pathfinding_test_ = 0;
+    chrono_for_pathfinding_ = 0;
+    chrono_movement_ = 0;
+
+    /*for(x=0 ; x<config_.getMapSize().x ; x++)
+    {
+        for(y = 0 ; y < config_.getMapSize().y ; y++)
+        {
+            closed_nodes_map_.push_back(0);
+
+        }
+    }*/
     for(int x = 0; x < config_.getMapSize().x ; x++ )
     {
         for(int y = 0 ; y < config_.getMapSize().y ; y++)
@@ -35,11 +45,11 @@ void Game::gameLoop()
 
     }
 
-    for(int i = 0 ; i <= 200 ; i++)
+    for(int i = 0 ; i <= config_.getMapSize().x ; i++)
     {
-        for(int j = 0 ; j <= 200 ; j++)
+        for(int j = 0 ; j <= config_.getMapSize().y ; j++)
         {
-            solid_map_[i][j] = false;
+            solid_map_.push_back(false);
         }
     }
 
@@ -55,7 +65,7 @@ void Game::gameLoop()
 
 void Game::update(SDL_Event& event)
 {
-    //inputs_.mouseIsImmobile();
+
     inputs_.calculateMouseTravel(event);
     while(SDL_PollEvent(&event))
     {
@@ -91,13 +101,19 @@ void Game::update(SDL_Event& event)
 
     }
 
+    //mouse coordinates on the world map (NOT on the screen)
     Point mouse_coords = inputs_.getMouseCoordinatesInPixels() + graphics_.getCamera().getPosition();
+
+    //tile coordinates that corresponds to the mouse position on the map
     Point mouse_coordinates_in_tiles;
     mouse_coordinates_in_tiles = (mouse_coords - (mouse_coords % config_.getTileSize()))/ config_.getTileSize();
 
+
+
     if(inputs_.getPressedMouseButtons()[SDL_BUTTON_LEFT])
     {
-        if(mouse_coords.intersect(world_editor_.getRect()) ||
+        //level editor window
+        if(inputs_.getMouseCoordinatesInPixels().intersect(world_editor_.getRect()) ||
            inputs_.getLockedWindow() == (&world_editor_))
         {
             world_editor_.receiveInputs(inputs_);
@@ -117,7 +133,7 @@ void Game::update(SDL_Event& event)
                 Wall wallou(mouse_coordinates_in_tiles);
                 world_map_.push_back(wallou);
                 std::cout << "creating wall at" << mouse_coordinates_in_tiles.x << ":" << mouse_coordinates_in_tiles.y << "with type" << wallou.getType() << std::endl;
-                solid_map_[mouse_coordinates_in_tiles.x][mouse_coordinates_in_tiles.y] = true;
+                solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
             }
 
             /*for(auto npc : npcs_list_)
@@ -134,13 +150,48 @@ void Game::update(SDL_Event& event)
         }
     }
 
-    if(inputs_.getPressedMouseButtons()[SDL_BUTTON_RIGHT] && npcs_list_[0].getTimeSinceLastOrder() > 300)
+    if(inputs_.getPressedKeys()[SDL_SCANCODE_X] || inputs_.getPressedMouseButtons()[SDL_BUTTON_MIDDLE])
     {
-        npcs_list_[0].setGoal(mouse_coordinates_in_tiles);
-        findPath(npcs_list_[0].getPosition(), npcs_list_[0].getGoal());
-        //std::cout << findPath(npcs_list_[0].getPosition(), npcs_list_[0].getGoal()) << std::endl;
-        //for(int i = 0 ; i < npcs_list_[0].get)
-        npcs_list_[0].setTimeSinceLastOrder();
+        auto it = std::find_if(world_map_.begin(), world_map_.end(),
+                                    [&mouse_coordinates_in_tiles](const Tile& obj) -> bool
+                                    {
+                                        (mouse_coordinates_in_tiles == obj.getPosition());
+                                    });
+
+        if(it != world_map_.end())
+        {
+            world_map_.erase(it);
+            Plains plains(mouse_coordinates_in_tiles);
+            world_map_.push_back(plains);
+            solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = false;
+        }
+
+    }
+
+    if(inputs_.getPressedKeys()[SDL_SCANCODE_F] && SDL_GetTicks() - last_time_npc_creation_ > 150)
+    {
+        npcs_list_.push_back(Peasant{mouse_coordinates_in_tiles});
+        std::cout << npcs_list_.size() << " npc exist" << std::endl;
+        last_time_npc_creation_ = SDL_GetTicks();
+    }
+
+
+    if(inputs_.getPressedMouseButtons()[SDL_BUTTON_RIGHT])
+    {
+        for(auto &peasant : npcs_list_)
+        {
+
+            if(SDL_GetTicks() - peasant.getTimeOfLastOrder()  > 500)
+            {
+                peasant.setGoal(mouse_coordinates_in_tiles);
+                findPath(peasant);
+                //std::cout << SDL_GetTicks() << " - " << peasant.getTimeOfLastOrder() << " nodes visited" << std::endl;
+                peasant.setTimeOfLastOrder(SDL_GetTicks());
+
+            }
+        }
+
+
     }
 
     if(inputs_.getPressedKeys()[SDL_SCANCODE_RIGHT])
@@ -155,16 +206,33 @@ void Game::update(SDL_Event& event)
 
     elapsed_time_ = SDL_GetTicks() - get_ticks_previous_frame_;
 
-    chrono_for_pathfinding_test_ += elapsed_time_;
+    chrono_for_pathfinding_ += elapsed_time_;
+    chrono_movement_ += elapsed_time_;
     fps_ = 1000/elapsed_time_;
+    std::cout << fps_ << std::endl;
     get_ticks_previous_frame_ = SDL_GetTicks();
 
-
-    //std::cout << chrono_for_pathfinding_test_ << std::endl;
-    if(chrono_for_pathfinding_test_ > 50)
+    if( chrono_for_pathfinding_> 600)
     {
-        npcs_list_[0].update();
-        chrono_for_pathfinding_test_ = 0;
+        for(auto &peasant : npcs_list_)
+        {
+            if(peasant.getGoal() != peasant.getPosition())
+            findPath(peasant);
+        }
+         chrono_for_pathfinding_ = 0;
+    }
+
+    if(chrono_movement_ > 100)
+    {
+
+        for(auto &peasant : npcs_list_)
+        {
+            if(peasant.getGoal() != peasant.getPosition())
+            peasant.move(npcs_list_);
+        }
+
+        chrono_movement_ = 0;
+
     }
 }
 
@@ -175,14 +243,16 @@ void Game::draw(Graphics& graphics, Config& config)
     graphics_.drawTiles(config, world_map_, pathfinding_nodes_);
     graphics_.drawWindows(world_editor_);
     graphics_.drawNpcs(config_, npcs_list_);
+    //graphics_.drawNodes(closed_nodes_map, open_nodes_map);
     graphics_.flip();
 }
 
 
 
-std::string Game::findPath( const Point start,
-                 const Point finish)
+bool Game::findPath(Peasant& peasant)
 {
+    Point start = peasant.getPosition();
+    Point finish = peasant.getGoal();
     static std::priority_queue<Node> pq[2]; // list of open (not-yet-tried) nodes
     static int pqi; // pq index
     static Node* n0;
@@ -194,13 +264,18 @@ std::string Game::findPath( const Point start,
     int yMovement[8] = {0, 1, 1, 1, 0, -1, -1, -1};
     pqi=0;
 
+
+    int closed_nodes_map[config_.getMapSize().x][config_.getMapSize().y];
+    int open_nodes_map[config_.getMapSize().x][config_.getMapSize().y];
+    int dir_map[config_.getMapSize().x][config_.getMapSize().y];
     // reset the node maps
-    for(y=0;y<200;y++)
+    for(y=0;y<config_.getMapSize().y;y++)
     {
-        for(x=0;x<200;x++)
+        for(x=0;x<config_.getMapSize().x;x++)
         {
             closed_nodes_map[x][y]=0;
             open_nodes_map[x][y]=0;
+
         }
     }
 
@@ -210,9 +285,22 @@ std::string Game::findPath( const Point start,
     pq[pqi].push(*n0);
     open_nodes_map[x][y]=n0->getFScore(); // mark it on the open nodes map
 
+    searched_tiles = 0;
     // A* search
     while(!pq[pqi].empty())
     {
+        if (searched_tiles > 10000)
+        {
+            //peasant.newRandomGoal();
+
+            //if(peasant.getRandomGoalsTried() > 4)
+            //{
+                peasant.noGoal();
+            //}
+
+        }
+
+
         // get the current node w/ the highest priority
         // from the list of open nodes
         n0=new Node( pq[pqi].top().getPosition(),
@@ -226,19 +314,19 @@ std::string Game::findPath( const Point start,
         closed_nodes_map[x][y]=1;
 
         // quit searching when the goal state is reached
-        //if((*n0).estimate(xFinish, yFinish) == 0)
+
         if(x==finish.x && y==finish.y)
         {
             // generate the path from finish to start
             // by following the directions
-            std::string path="";
+
             std::vector<DIRECTION> pathfinding_vector;
             while(!(x==start.x && y==start.y))
             {
                 j=dir_map[x][y];
 
-                c='0'+(j+8/2)%8;
-                path=c+path;
+                //c='0'+(j+8/2)%8;
+                //path=c+path;
                 auto it = pathfinding_vector.begin();
                 it = pathfinding_vector.insert(it,static_cast<DIRECTION>((j+4)%8) );
 
@@ -250,26 +338,20 @@ std::string Game::findPath( const Point start,
             delete n0;
             // empty the leftover nodes
             while(!pq[pqi].empty()) pq[pqi].pop();
-            npcs_list_[0].setPathfinding(pathfinding_vector);
-            return path;
+            peasant.setPathfinding(pathfinding_vector);
+            return true;
         }
         // generate moves (child nodes) in all possible directions
         for(i=0;i<8;i++)
         {
-            //xdx=x+xMovement[i]; ydy=y+yMovement[i];
             new_pos = Point{x+xMovement[i], y+yMovement[i]};
 
-            /*auto wall_position = find_if(world_map_.begin(), world_map_.end(), [&new_pos](const Tile& tile) -> bool
-                                    {
-                                   return (tile.getPosition() == new_pos && tile.getType() == WALL);
-                                   });
-*/
-            //if(wall_position == world_map_.end())
-                //std::cout << "tile at " << new_pos.x << ":" << new_pos.y <<  "isn't a wall, so we proceed" << std::endl;
 
-            if(!(new_pos.x<0 || new_pos.x>199 || new_pos.y<0 || new_pos.y>199 || closed_nodes_map[new_pos.x][new_pos.y]==1) && !solid_map_[new_pos.x][new_pos.y])
+            auto it = find_if(npcs_list_.begin(), npcs_list_.end(), [&new_pos](const Peasant& peas){ return peas.getPosition() == new_pos;});
+            if(!(new_pos.x<0 || new_pos.x>199 || new_pos.y<0 || new_pos.y>199 || closed_nodes_map[new_pos.x][new_pos.y]==1)
+               && !solid_map_[new_pos.x + new_pos.y * config_.getMapSize().y] && it == npcs_list_.end())
             {
-                //std::cout << new_pos.x << ":" << new_pos.y << std::endl;
+                searched_tiles++;
                 // generate a child node
                 m0=new Node( new_pos, n0->getGScore(),
                              n0->getFScore());
@@ -283,7 +365,6 @@ std::string Game::findPath( const Point start,
                     pq[pqi].push(*m0);
                     // mark its parent node direction
                     dir_map[new_pos.x][new_pos.y]=(i+8/2)%8;
-                    //std::cout << "new dir = " << dir_map[new_pos.x][new_pos.y] << std::endl;
 
                 }
                 else if(open_nodes_map[new_pos.x][new_pos.y]>m0->getFScore())
@@ -293,9 +374,7 @@ std::string Game::findPath( const Point start,
                     open_nodes_map[new_pos.x][new_pos.y]=m0->getFScore();
                     // update the parent direction info
                     dir_map[new_pos.x][new_pos.y]=(i+8/2)%8;
-                    /*std::cout << "tile at " << new_pos.x << ":" << new_pos.y <<
-                    "isn't a wall, and it's in the open list, but it has a higher priority, so we add it and give it direction" <<
-                    dir_map[new_pos.x][new_pos.y] << std::endl;*/
+
                     // replace the node
                     // by emptying one pq to the other one
                     // except the node to be replaced will be ignored
@@ -322,5 +401,5 @@ std::string Game::findPath( const Point start,
         }
         delete n0; // garbage collection
     }
-    return ""; // no route found
+
 }

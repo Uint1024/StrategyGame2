@@ -18,7 +18,7 @@ class Inputs
         void keyUpEvent(const SDL_Event& event);
         std::map<SDL_Scancode, bool> getPressedKeys() const;
         std::map<int, bool> getPressedMouseButtons() const;
-
+        //std::map<SDL_Scancode, bool> getPressedKeysLastFrame() const;
         void mouseButtonDownEvent(const SDL_Event& event);
         void mouseButtonUpEvent(const SDL_Event& event);
         Point getMouseCoordinatesInPixels() const;
@@ -26,12 +26,15 @@ class Inputs
         void mouseMotionEvent(const SDL_Event& event);
         void mouseIsImmobile();
         Window* getLockedWindow() const;
-void calculateMouseTravel(const SDL_Event& event);
+        void calculateMouseTravel(const SDL_Event& event);
         void setLockedWindow(Window* windo);
         float getTimeSinceLastRightClick() const;
+
     protected:
     private:
         std::map<SDL_Scancode, bool> pressed_keys_;
+        std::map<SDL_Scancode, bool> pressed_keys_last_frame;
+        std::map<SDL_Scancode, bool> held_keys_;
         std::map<int, bool> pressed_mouse_buttons_;
         std::map<int, bool> held_mouse_buttons; //held for more than 1 frame
         Point mouse_coordinates_in_pixels;

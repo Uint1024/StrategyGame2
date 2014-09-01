@@ -13,7 +13,20 @@ Inputs::~Inputs()
 
 void Inputs::keyDownEvent(const SDL_Event& event)
 {
-    pressed_keys_[event.key.keysym.scancode] = true;
+    if(pressed_keys_[event.key.keysym.scancode] == true)
+    {
+        pressed_keys_[event.key.keysym.scancode] = false;
+        held_keys_[event.key.keysym.scancode] = true;
+
+        std::cout << pressed_keys_[SDL_SCANCODE_F] << std::endl;
+    }
+    else
+    {
+        pressed_keys_[event.key.keysym.scancode] = true;
+        held_keys_[event.key.keysym.scancode] = false;
+        std::cout << pressed_keys_[SDL_SCANCODE_F] << std::endl;
+    }
+
 }
 
 void Inputs::keyUpEvent(const SDL_Event& event)

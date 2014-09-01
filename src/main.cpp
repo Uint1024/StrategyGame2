@@ -6,7 +6,7 @@
 #include "Graphics.h"
 #include "Coordinate.h"
 #include "Game.h"
-
+#include "time.h"
 #define TAU 6.2831853071
 
 #undef main
@@ -15,6 +15,7 @@
 
 int main()
 {
+    srand ( time(NULL) );
     if(SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         printf("Could not initialize SDL: %s.\n", SDL_GetError());

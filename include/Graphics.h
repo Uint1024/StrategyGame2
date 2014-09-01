@@ -25,6 +25,7 @@ class Graphics
         Camera getCamera() const;
         void drawWindows(Window& windo) const;
         void drawNpcs(Config& config, std::vector<Peasant>& npcs_list) const;
+        void drawNodes(int (&open_nodes_map)[200][200], int (&closed_nodes_map)[200][200]);
     protected:
     private:
         SDL_Window* sdl_window_;

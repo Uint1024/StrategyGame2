@@ -10,7 +10,7 @@ public:
 private:
     const Dimension tile_size{20,20};
     const Dimension screen_size_{640,480};
-    const Dimension map_size_{200,200};
+    const Dimension map_size_{100,100};
 
 };
 
