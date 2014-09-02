@@ -37,13 +37,14 @@ void Game::gameLoop()
 
         }
     }*/
-    for(int x = 0; x < config_.getMapSize().x ; x++ )
+    for(int y = 0 ; y < config_.getMapSize().y ; y++)
     {
-        for(int y = 0 ; y < config_.getMapSize().y ; y++)
+
+        for(int x = 0; x < config_.getMapSize().x ; x++ )
         {
             auto plains_tile = std::make_shared<Plains>(Point{x,y});
-
-            world_map_.push_back(plains_tile);
+            world_map_[0].push_back(plains_tile);
+            world_map_[1].push_back(nullptr);
         }
 
     }
@@ -112,7 +113,7 @@ void Game::update(SDL_Event& event)
     mouse_coordinates_in_tiles = (mouse_coords - (mouse_coords % config_.getTileSize()))/ config_.getTileSize();
 
 
-
+    int mouse_position_in_vector = mouse_coordinates_in_tiles.y * config_.getMapSize().y + mouse_coordinates_in_tiles.x;
     if(inputs_.getPressedMouseButtons()[SDL_BUTTON_LEFT])
     {
         //level editor window
@@ -137,7 +138,7 @@ void Game::update(SDL_Event& event)
                     if(mouse_coords.intersect(npc.getRect(graphics_, config_)))
                     {
                         selected_npc_ = &npc;
-                        std::cout << "selected npc at " << npc.getPosition().x << ":" << npc.getPosition().y << std::endl;
+
                     }
                 }
             }
@@ -145,61 +146,43 @@ void Game::update(SDL_Event& event)
             {
                 if(current_selected_world_editor_object_ != EMPTY)
                 {
-                   auto it = std::find_if(world_map_.begin(), world_map_.end(),
+                   /*auto it = std::find_if(world_map_.begin(), world_map_.end(),
                                         [&mouse_coordinates_in_tiles](const std::shared_ptr<Tile>& obj) -> bool
                                         {
                                             (mouse_coordinates_in_tiles == obj->getPosition());
-                                        });
-
-                    world_map_.erase(it);
+                                        });*/
 
                     if(current_selected_world_editor_object_ == WALL)
                     {
-                        //Wall wall(mouse_coordinates_in_tiles);
-                        world_map_.push_back(std::make_shared<Wall>(mouse_coordinates_in_tiles));
+                        world_map_[1][mouse_position_in_vector] = std::make_shared<Wall>(mouse_coordinates_in_tiles);
                         solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
                     }
                     else if(current_selected_world_editor_object_ == PLAINS)
                     {
-                        //Plains plains(mouse_coordinates_in_tiles);
-                        world_map_.push_back(std::make_shared<Plains>(mouse_coordinates_in_tiles));
+                        world_map_[0][mouse_position_in_vector] = std::make_shared<Plains>(mouse_coordinates_in_tiles);
                         solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = false;
                     }
                     else if(current_selected_world_editor_object_ == TREE)
                     {
-                        //Tree object(mouse_coordinates_in_tiles);
-                        world_map_.push_back(std::make_shared<Tree>(mouse_coordinates_in_tiles));
+                        world_map_[1][mouse_position_in_vector] = std::make_shared<Tree>(mouse_coordinates_in_tiles);
                         solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
                     }
-
                 }
             }
 
         }
     }
 
-    /*if(inputs_.getPressedKeys()[SDL_SCANCODE_X] || inputs_.getPressedMouseButtons()[SDL_BUTTON_MIDDLE])
+    if(inputs_.getPressedKeys()[SDL_SCANCODE_X] || inputs_.getPressedMouseButtons()[SDL_BUTTON_MIDDLE])
     {
-        auto it = std::find_if(world_map_.begin(), world_map_.end(),
-                                    [&mouse_coordinates_in_tiles](const Tile& obj) -> bool
-                                    {
-                                        (mouse_coordinates_in_tiles == obj.getPosition());
-                                    });
 
-        if(it != world_map_.end())
-        {
-            world_map_.erase(it);
-            Plains plains(mouse_coordinates_in_tiles);
-            world_map_.push_back(plains);
-            solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = false;
-        }
+        world_map_[1][mouse_position_in_vector] = nullptr;
 
-    }*/
+    }
 
     if(inputs_.getPressedKeys()[SDL_SCANCODE_F] && SDL_GetTicks() - last_time_npc_creation_ > 150)
     {
         npcs_list_.push_back(Peasant{mouse_coordinates_in_tiles});
-        std::cout << npcs_list_.size() << " npc exist" << std::endl;
         last_time_npc_creation_ = SDL_GetTicks();
     }
 
@@ -208,32 +191,31 @@ void Game::update(SDL_Event& event)
     {
         if(selected_npc_ != nullptr)
         {
-            selected_npc_->setGoal(mouse_coordinates_in_tiles);
-            findPath(*selected_npc_);
-            selected_npc_->setTimeOfLastOrder(SDL_GetTicks());
-
-            //finding the tile at the goal
-            auto it = find_if(world_map_.begin(), world_map_.end(),
-                              [mouse_coordinates_in_tiles](const std::shared_ptr<Tile> tile) -> bool
-                              {
-                                  return tile->getPosition() == mouse_coordinates_in_tiles;
-                              });
-
-
-            if((*it)->getType() == TREE)
-                selected_npc_->cutWood(std::dynamic_pointer_cast<Tree>(*it));
-        }
-        /*for(auto &peasant : npcs_list_)
-        {
-            if(SDL_GetTicks() - peasant.getTimeOfLastOrder()  > 200)
+            if(SDL_GetTicks() - selected_npc_->getTimeOfLastOrder() > 100)
             {
-                peasant.setGoal(mouse_coordinates_in_tiles);
-                findPath(peasant);
-                //std::cout << SDL_GetTicks() << " - " << peasant.getTimeOfLastOrder() << " nodes visited" << std::endl;
-                peasant.setTimeOfLastOrder(SDL_GetTicks());
+                if(world_map_[1][mouse_position_in_vector] != nullptr)
+                {
+                    if(world_map_[1][mouse_position_in_vector]->getType() == TREE)
+                    {
+                        selected_npc_->setRessourceGoal(std::dynamic_pointer_cast<Tree>(world_map_[1][mouse_position_in_vector]));
+                    }
+                }
+
+                selected_npc_->setGoal(mouse_coordinates_in_tiles);
+                findPath(*selected_npc_);
+                selected_npc_->setTimeOfLastOrder(SDL_GetTicks());
+
+                //finding the tile at the goal
+                /*auto it = find_if(world_map_.begin(), world_map_.end(),
+                                  [mouse_coordinates_in_tiles](const std::shared_ptr<Tile> tile) -> bool
+                                  {
+                                      return tile->getPosition() == mouse_coordinates_in_tiles;
+                                  });*/
+
+
 
             }
-        }*/
+        }
 
 
     }
@@ -256,28 +238,42 @@ void Game::update(SDL_Event& event)
     //std::cout << fps_ << std::endl;
     get_ticks_previous_frame_ = SDL_GetTicks();
 
-    if( chrono_for_pathfinding_> 300)
+    if( chrono_for_pathfinding_> 100)
     {
         for(auto &peasant : npcs_list_)
         {
-            //std::cout << peasant.getGoal().x << "=" << peasant.getPosition().x << std::endl;
             if(peasant.getGoal() != peasant.getPosition())
                 findPath(peasant);
         }
          chrono_for_pathfinding_ = 0;
     }
 
-    if(chrono_movement_ > 100)
+    if(chrono_movement_ > 70)
     {
 
         for(auto &peasant : npcs_list_)
         {
-            if(peasant.getGoal() != peasant.getPosition())
-            peasant.move(npcs_list_);
+            peasant.update(npcs_list_, world_map_);
         }
 
         chrono_movement_ = 0;
 
+    }
+
+//for (auto it = aVector.begin(); it != aVector.end(); ++it) {
+    for(auto it = world_map_[1].begin() ; it != world_map_[1].end() ; ++it)
+    {
+        if((*it) != nullptr)
+        {
+            if((*it)->getType() == TREE)
+            {
+                std::shared_ptr<Tree> tree = std::dynamic_pointer_cast<Tree>((*it));
+                if(!tree->update()) //if update() return false, the tree is dead
+                {
+                    (*it) = nullptr;
+                }
+            }
+        }
     }
 }
 
@@ -381,40 +377,23 @@ bool Game::findPath(Peasant& peasant)
 
         if (searched_tiles > 10000)
         {
-
-            /*std::vector<DIRECTION> pathfinding_vector;
-            while(!(x==start.x && y==start.y))
-            {
-                j=dir_map[x][y];
-
-                //c='0'+(j+8/2)%8;
-                //path=c+path;
-                auto it = pathfinding_vector.begin();
-                it = pathfinding_vector.insert(it,static_cast<DIRECTION>((j+4)%8) );
-
-                x+=xMovement[j];
-                y+=yMovement[j];
-
-                std::cout << x << ":" << y << std::endl;
-            }
-
-            // garbage collection
-            //delete n0;
-            // empty the leftover nodes
-            while(!pq[pqi].empty()) pq[pqi].pop();
-            peasant.setPathfinding(pathfinding_vector);
-
-            */if(peasant.getRandomGoalsTried() > 2)
+            /*if(peasant.getRandomGoalsTried() > 8)
             {
 
                 peasant.noGoal();
+                std::cout << "can't find path" << std::endl;
                 return false;
             }
             else
             {
+                std::cout << "can't find path, searching close one" << std::endl;
                 peasant.newRandomGoal();
                 return false;
-            }
+            }*/
+
+                peasant.noGoal();
+                std::cout << "can't find path" << std::endl;
+                return false;
 
         }
 
@@ -422,12 +401,49 @@ bool Game::findPath(Peasant& peasant)
         for(i=0;i<8;i++)
         {
             new_pos = Point{x+xMovement[i], y+yMovement[i]};
-
-
-            auto it = find_if(npcs_list_.begin(), npcs_list_.end(), [&new_pos](const Peasant& peas){ return peas.getPosition() == new_pos;});
-            if(!(new_pos.x<0 || new_pos.x>199 || new_pos.y<0 || new_pos.y>199 || closed_nodes_map[new_pos.x][new_pos.y]==1)
-               && !solid_map_[new_pos.x + new_pos.y * config_.getMapSize().y] && it == npcs_list_.end())
+            bool tile_is_solid = false;
+            if(!(new_pos.x<0 || new_pos.x>99 || new_pos.y<0 || new_pos.y>99))
             {
+                std::shared_ptr<Tile> tile_at_new_pos = world_map_[1][new_pos.y * config_.getMapSize().y + new_pos.x];
+
+
+                if(tile_at_new_pos!= nullptr)
+                {
+
+                    tile_is_solid = tile_at_new_pos->isSolid();
+
+
+                    if(tile_at_new_pos == peasant.getRessourceGoal())
+                    {
+                        std::vector<DIRECTION> pathfinding_vector;
+
+                        while(!(x==start.x && y==start.y))
+                        {
+                            j=dir_map[x][y];
+
+                            auto it = pathfinding_vector.begin();
+                            it = pathfinding_vector.insert(it,static_cast<DIRECTION>((j+4)%8) );
+
+                            x+=xMovement[j];
+                            y+=yMovement[j];
+                        }
+
+                        // garbage collection
+                        delete n0;
+                        // empty the leftover nodes
+                        while(!pq[pqi].empty()) pq[pqi].pop();
+                        peasant.setPathfinding(pathfinding_vector);
+                        return true;
+                    }
+                }
+
+            }
+            //auto it = find_if(npcs_list_.begin(), npcs_list_.end(), [&new_pos](const Peasant& peas){ return peas.getPosition() == new_pos;});
+            if(!(new_pos.x<0 || new_pos.x>99 || new_pos.y<0 || new_pos.y>99 || closed_nodes_map[new_pos.x][new_pos.y]==1)
+               && !tile_is_solid)
+            {
+
+                /*!solid_map_[new_pos.x + new_pos.y * config_.getMapSize().y]*/
                 searched_tiles++;
                 // generate a child node
                 m0=new Node( new_pos, n0->getGScore(),

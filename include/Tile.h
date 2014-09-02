@@ -8,14 +8,9 @@ class Tile : public Entity
     public:
         Tile(Point position, bool solid, TILE_TYPE type, std::string texture_name);
         virtual ~Tile();
-        //Point getPosition() const;
         TILE_TYPE getType() const;
-        Uint16 getLevel();
-        Uint16 getPriority();
-        void testtest() { std::cout << "hap" << std::endl; }
+        bool isSolid() const;
     protected:
-        //Dimension size_; // in config.h
-        //Point position_; //position in tiles, not in pixel, so (10,10) means 10th tile from the top and from the left
         bool solid_; //can't walk through solid tiles
         TILE_TYPE type_;
 

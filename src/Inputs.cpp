@@ -24,7 +24,6 @@ void Inputs::keyDownEvent(const SDL_Event& event)
     {
         pressed_keys_[event.key.keysym.scancode] = true;
         held_keys_[event.key.keysym.scancode] = false;
-        std::cout << pressed_keys_[SDL_SCANCODE_F] << std::endl;
     }
 
 }
@@ -53,7 +52,6 @@ void Inputs::mouseButtonUpEvent(const SDL_Event& event)
 
 float Inputs::getTimeSinceLastRightClick() const
 {
-    //std::cout << SDL_GetTicks() - last_right_click_ << std::endl;
     return (SDL_GetTicks() - last_right_click_);
 }
 

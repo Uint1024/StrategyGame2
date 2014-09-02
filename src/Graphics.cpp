@@ -1,10 +1,10 @@
 #include "Graphics.h"
 
-Graphics::Graphics() :  window_size_{640,480},
+Graphics::Graphics() :  window_size_{1000,1000},
                         sdl_window_{SDL_CreateWindow(
                                     "Strategy game c++ SDL 2.0",
                                     SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                    640, 480, 0)},
+                                    1000, 1000, 0)},
                         sdl_renderer_{SDL_CreateRenderer(
                                     sdl_window_, 0,
                                     SDL_RENDERER_ACCELERATED |
@@ -21,21 +21,15 @@ Graphics::~Graphics()
     SDL_DestroyRenderer(sdl_renderer_);
 }
 
-void Graphics::drawTiles(Config& config, std::vector<std::shared_ptr<Tile>>& world_map,
+void Graphics::drawTiles(Config& config, std::vector<std::shared_ptr<Tile>> (&world_map)[2],
                           std::vector<Node*>& pathfinding_nodes)
 {
 
 
-    for(auto &tile : world_map)
+    for(auto &tile : world_map[0])
     {
         Point tile_position = tile->getPosition() * config.getTileSize() - camera_.getPosition();
-        /*if(tile.getType() == WALL)
-        {
 
-            SDL_RenderFillRect(sdl_renderer_, tile_rect);
-
-            delete tile_rect;
-        }*/
         SDL_Rect* src_rect = new SDL_Rect{  0,
                                             0,
                                             config.getTileSize().x,
@@ -52,6 +46,31 @@ void Graphics::drawTiles(Config& config, std::vector<std::shared_ptr<Tile>>& wor
         delete dest_rect;
     }
 
+    for(auto &tile : world_map[1])
+    {
+        if(tile != nullptr)
+        {
+
+            Point tile_position = tile->getPosition() * config.getTileSize() - camera_.getPosition();
+
+            SDL_Rect* src_rect = new SDL_Rect{  0,
+                                                0,
+                                                config.getTileSize().x,
+                                                config.getTileSize().y};
+
+            SDL_Rect* dest_rect = new SDL_Rect{ tile_position.x,
+                                                tile_position.y,
+                                                config.getTileSize().x,
+                                                config.getTileSize().y};
+
+            SDL_RenderCopy(sdl_renderer_, loadImage(tile->getTextureName()), src_rect, dest_rect);
+
+            delete src_rect;
+            delete dest_rect;
+        }
+    }
+
+
     /*for(auto node : pathfinding_nodes)
     {
         SDL_SetRenderDrawColor(sdl_renderer_, 0x00, 0xFF, 0x00, 0xFF);
@@ -65,7 +84,6 @@ void Graphics::drawTiles(Config& config, std::vector<std::shared_ptr<Tile>>& wor
     SDL_SetRenderDrawColor(sdl_renderer_, 0x00, 0x00, 0x00, 0xFF);
 
 
-    //TODO : set a real size for the map...
     for(int x = 0 ; x < config.getMapSize().x ; x++)
     {
         SDL_RenderDrawLine(sdl_renderer_, x * config.getTileSize().x - camera_.getPosition().x, 0, x * config.getTileSize().x - camera_.getPosition().x, window_size_.y);
@@ -118,9 +136,6 @@ void Graphics::drawWindow(const Window* windo, const std::vector<Icon>& icon_lis
     }
 }
 
-/*void Graphics::drawIcon(const Icon& icon) const
-{
-    Point icon_position = npc.getPosition() * config.getTileSize() - camera_.getPosition();*/
 void Graphics::drawNodes(int (&open_nodes_map)[200][200], int (&closed_nodes_map)[200][200])
 {
     /*SDL_SetRenderDrawColor(sdl_renderer_, 0x00, 0xFF, 0xAA, 0xFF);

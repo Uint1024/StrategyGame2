@@ -417,11 +417,11 @@
 1409618586 c:\users\john\documents\github\strategygame\include\coordinate.h
 	<SDL.h>
 
-1409625822 source:c:\users\john\documents\github\strategygame\src\game.cpp
+1409694341 source:c:\users\john\documents\github\strategygame\src\game.cpp
 	"Game.h"
 	"Tree.h"
 
-1409621645 c:\users\john\documents\github\strategygame\include\game.h
+1409662574 c:\users\john\documents\github\strategygame\include\game.h
 	<SDL.h>
 	"Graphics.h"
 	"Inputs.h"
@@ -435,7 +435,7 @@
 	"Plains.h"
 	"Window.h"
 
-1409623085 c:\users\john\documents\github\strategygame\include\graphics.h
+1409676297 c:\users\john\documents\github\strategygame\include\graphics.h
 	<SDL.h>
 	<iostream>
 	<vector>
@@ -451,7 +451,7 @@
 
 1409533803 c:\users\john\documents\github\strategygame\include\config.h
 
-1409624007 c:\users\john\documents\github\strategygame\include\tile.h
+1409689006 c:\users\john\documents\github\strategygame\include\tile.h
 	"Coordinate.h"
 	<SDL.h>
 	"Entity.h"
@@ -477,7 +477,7 @@
 	"Tile.h"
 	<SDL.h>
 
-1409623532 source:c:\users\john\documents\github\strategygame\src\graphics.cpp
+1409676401 source:c:\users\john\documents\github\strategygame\src\graphics.cpp
 	"Graphics.h"
 
 1409522542 source:c:\users\john\documents\github\strategygame\src\inputs.cpp
@@ -496,13 +496,13 @@
 1409358159 c:\users\john\documents\github\strategygame\include\main.h
 	"graphics.h"
 
-1409595100 source:c:\users\john\documents\github\strategygame\src\node.cpp
+1409693946 source:c:\users\john\documents\github\strategygame\src\node.cpp
 	"Node.h"
 
 1409577001 source:c:\users\john\documents\github\strategygame\src\plains.cpp
 	"Plains.h"
 
-1409577069 source:c:\users\john\documents\github\strategygame\src\tile.cpp
+1409689019 source:c:\users\john\documents\github\strategygame\src\tile.cpp
 	"Tile.h"
 
 1409577010 source:c:\users\john\documents\github\strategygame\src\wall.cpp
@@ -526,14 +526,16 @@
 	"Graphics.h"
 	"Config.h"
 
-1409625915 source:c:\users\john\documents\github\strategygame\src\peasant.cpp
+1409694637 source:c:\users\john\documents\github\strategygame\src\peasant.cpp
 	"Peasant.h"
 	"Tree.h"
 
-1409625682 c:\users\john\documents\github\strategygame\include\peasant.h
+1409694421 c:\users\john\documents\github\strategygame\include\peasant.h
 	<vector>
 	<memory>
 	<iostream>
+	<math.h>
+	<cstdlib>
 	"Entity.h"
 	"Coordinate.h"
 	"Tile.h"
@@ -553,10 +555,12 @@
 1409611738 source:c:\users\john\documents\github\strategygame\src\icon.cpp
 	"Icon.h"
 
-1409625900 source:c:\users\john\documents\github\strategygame\src\tree.cpp
+1409694717 source:c:\users\john\documents\github\strategygame\src\tree.cpp
 	"Tree.h"
+	"Peasant.h"
+	<iostream>
 
-1409625924 c:\users\john\documents\github\strategygame\include\tree.h
+1409686829 c:\users\john\documents\github\strategygame\include\tree.h
 	"Entity.h"
 	"Tile.h"
 	"Coordinate.h"

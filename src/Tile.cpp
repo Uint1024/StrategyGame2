@@ -12,3 +12,4 @@ Tile::~Tile()
 
 
 TILE_TYPE Tile::getType() const { return type_; }
+bool Tile::isSolid() const { return solid_; }

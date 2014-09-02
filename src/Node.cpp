@@ -35,7 +35,7 @@ const float Node::calculate_distance_to_goal(const Point& destination) const
 
     //Chebyshev distance
     float distance = (difference.x + difference.y) + (1.41f - 2) * std::min(difference.x, difference.y);
-    //std::cout << distance << std::endl;
+
     return(distance);
 }
 
