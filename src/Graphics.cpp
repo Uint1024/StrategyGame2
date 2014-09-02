@@ -7,7 +7,9 @@ Graphics::Graphics() :  window_size_{640,480},
                                     640, 480, 0)},
                         sdl_renderer_{SDL_CreateRenderer(
                                     sdl_window_, 0,
-                                    SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE)}
+                                    SDL_RENDERER_ACCELERATED |
+                                    SDL_RENDERER_PRESENTVSYNC |
+                                    SDL_RENDERER_TARGETTEXTURE)}
 
 {
     std::cout << "graphics initialized" << std::endl;
@@ -19,13 +21,14 @@ Graphics::~Graphics()
     SDL_DestroyRenderer(sdl_renderer_);
 }
 
-void Graphics::drawTiles(Config& config, std::vector<Tile>& world_map, std::vector<Node*>& pathfinding_nodes)
+void Graphics::drawTiles(Config& config, std::vector<std::shared_ptr<Tile>>& world_map,
+                          std::vector<Node*>& pathfinding_nodes)
 {
 
 
-    for(auto tile : world_map)
+    for(auto &tile : world_map)
     {
-        Point tile_position = tile.getPosition() * config.getTileSize() - camera_.getPosition();
+        Point tile_position = tile->getPosition() * config.getTileSize() - camera_.getPosition();
         /*if(tile.getType() == WALL)
         {
 
@@ -43,7 +46,7 @@ void Graphics::drawTiles(Config& config, std::vector<Tile>& world_map, std::vect
                                             config.getTileSize().x,
                                             config.getTileSize().y};
 
-        SDL_RenderCopy(sdl_renderer_, loadImage(tile.getTextureName()), src_rect, dest_rect);
+        SDL_RenderCopy(sdl_renderer_, loadImage(tile->getTextureName()), src_rect, dest_rect);
 
         delete src_rect;
         delete dest_rect;
@@ -88,7 +91,7 @@ void Graphics::drawWindow(const Window* windo, const std::vector<Icon>& icon_lis
 
     for(auto &icon : icon_list)
     {
-        Point icon_position = icon.getPosition() + windo->getPosition();
+        Point icon_position = icon.getPosition();
         SDL_Rect* src_rect = new SDL_Rect{  0,
                                             0,
                                             icon.getSize().x,
@@ -101,8 +104,17 @@ void Graphics::drawWindow(const Window* windo, const std::vector<Icon>& icon_lis
 
         SDL_RenderCopy(sdl_renderer_, loadImage(icon.getTextureName()), src_rect, dest_rect);
 
+
+        if(&icon == windo->getSelectedIcon())
+        {
+            //SDL_Rect* selected_icon_rect = new SDL_Rect{}
+            SDL_SetRenderDrawColor(sdl_renderer_, 255, 0, 0, 0xFF);
+            SDL_RenderDrawRect(sdl_renderer_, dest_rect);
+        }
+
         delete src_rect;
         delete dest_rect;
+
     }
 }
 

@@ -1,4 +1,5 @@
 #include "Peasant.h"
+#include "Tree.h"
 
 Peasant::Peasant(Point position) : Entity(position, Dimension{20,20}, "peasant.png"), goal_(position)
 {
@@ -140,6 +141,13 @@ void Peasant::newRandomGoal()
     std::cout << random_goals_tried << std::endl;
 
     goal_ = goal_ + Point{xMovement[position_to_goal_],yMovement[position_to_goal_]};
+}
+
+void Peasant::cutWood(std::shared_ptr<Tree> tree)
+{
+    std::cout << "I'm cutting wood" << std::endl;
+
+    tree->sayHi();
 }
 
 int Peasant::getRandomGoalsTried()

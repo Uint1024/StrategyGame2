@@ -45,11 +45,13 @@
 		<Unit filename="include/Entity.h" />
 		<Unit filename="include/Game.h" />
 		<Unit filename="include/Graphics.h" />
+		<Unit filename="include/Icon.h" />
 		<Unit filename="include/Inputs.h" />
 		<Unit filename="include/Node.h" />
 		<Unit filename="include/Peasant.h" />
 		<Unit filename="include/Plains.h" />
 		<Unit filename="include/Tile.h" />
+		<Unit filename="include/Tree.h" />
 		<Unit filename="include/Wall.h" />
 		<Unit filename="include/Window.h" />
 		<Unit filename="include/main.h" />
@@ -57,11 +59,13 @@
 		<Unit filename="src/Entity.cpp" />
 		<Unit filename="src/Game.cpp" />
 		<Unit filename="src/Graphics.cpp" />
+		<Unit filename="src/Icon.cpp" />
 		<Unit filename="src/Inputs.cpp" />
 		<Unit filename="src/Node.cpp" />
 		<Unit filename="src/Peasant.cpp" />
 		<Unit filename="src/Plains.cpp" />
 		<Unit filename="src/Tile.cpp" />
+		<Unit filename="src/Tree.cpp" />
 		<Unit filename="src/Wall.cpp" />
 		<Unit filename="src/Window.cpp" />
 		<Unit filename="src/main.cpp" />

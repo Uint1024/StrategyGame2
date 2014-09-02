@@ -6,6 +6,7 @@
 #include "Tile.h"
 #include "Wall.h"
 #include <vector>
+#include <memory>
 #include <algorithm>
 #include <queue>
 #include "Node.h"
@@ -27,7 +28,7 @@ class Game
         Inputs inputs_;
         Config config_;
         bool playing_;
-        std::vector<Tile> world_map_;
+        std::vector<std::shared_ptr<Tile>> world_map_;
         Point start;
         Point finish;
         std::vector<Node*> pathfinding_nodes_;

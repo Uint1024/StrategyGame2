@@ -12,6 +12,7 @@ class Tile : public Entity
         TILE_TYPE getType() const;
         Uint16 getLevel();
         Uint16 getPriority();
+        void testtest() { std::cout << "hap" << std::endl; }
     protected:
         //Dimension size_; // in config.h
         //Point position_; //position in tiles, not in pixel, so (10,10) means 10th tile from the top and from the left

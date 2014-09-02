@@ -3,10 +3,11 @@
 #include "Coordinate.h"
 #include <SDL.h>
 #include <iostream>
-
+class Window;
 class Icon
 {
     public:
+        friend class Window;
         Icon(Point position, std::string texture_name, TILE_TYPE type);
         virtual ~Icon();
         Point getPosition() const;

@@ -1,6 +1,7 @@
 #include "Game.h"
+#include "Tree.h"
 
-Game::Game() : config_(), graphics_(), world_editor_{new Window{Point{10,10}, Dimension{100,100}, true, Color{200,0,0}}},
+Game::Game() : config_(), graphics_(), world_editor_{new Window{Point{10,10}, Dimension{100,100}, true, Color{200,200,200}}},
                 selected_npc_(nullptr)
 {
 
@@ -40,7 +41,8 @@ void Game::gameLoop()
     {
         for(int y = 0 ; y < config_.getMapSize().y ; y++)
         {
-            Plains plains_tile(Point{x,y});
+            auto plains_tile = std::make_shared<Plains>(Point{x,y});
+
             world_map_.push_back(plains_tile);
         }
 
@@ -118,8 +120,7 @@ void Game::update(SDL_Event& event)
            inputs_.getLockedWindow() == (world_editor_))
         {
             world_editor_->receiveInputs(inputs_);
-
-
+            current_selected_world_editor_object_ = world_editor_->clickedOnIcon(inputs_.getMouseCoordinatesInPixels());
         }
         else if(inputs_.getLockedWindow() == nullptr)
         {
@@ -142,27 +143,42 @@ void Game::update(SDL_Event& event)
             }
             else
             {
-                auto it = std::find_if(world_map_.begin(), world_map_.end(),
-                                        [&mouse_coordinates_in_tiles](const Tile& obj) -> bool
+                if(current_selected_world_editor_object_ != EMPTY)
+                {
+                   auto it = std::find_if(world_map_.begin(), world_map_.end(),
+                                        [&mouse_coordinates_in_tiles](const std::shared_ptr<Tile>& obj) -> bool
                                         {
-                                            (mouse_coordinates_in_tiles == obj.getPosition());
+                                            (mouse_coordinates_in_tiles == obj->getPosition());
                                         });
 
-                if((*it).getType() != WALL)
-                {
                     world_map_.erase(it);
 
-                    Wall wallou(mouse_coordinates_in_tiles);
-                    world_map_.push_back(wallou);
-                    std::cout << "creating wall at" << mouse_coordinates_in_tiles.x << ":" << mouse_coordinates_in_tiles.y << "with type" << wallou.getType() << std::endl;
-                    solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
+                    if(current_selected_world_editor_object_ == WALL)
+                    {
+                        //Wall wall(mouse_coordinates_in_tiles);
+                        world_map_.push_back(std::make_shared<Wall>(mouse_coordinates_in_tiles));
+                        solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
+                    }
+                    else if(current_selected_world_editor_object_ == PLAINS)
+                    {
+                        //Plains plains(mouse_coordinates_in_tiles);
+                        world_map_.push_back(std::make_shared<Plains>(mouse_coordinates_in_tiles));
+                        solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = false;
+                    }
+                    else if(current_selected_world_editor_object_ == TREE)
+                    {
+                        //Tree object(mouse_coordinates_in_tiles);
+                        world_map_.push_back(std::make_shared<Tree>(mouse_coordinates_in_tiles));
+                        solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
+                    }
+
                 }
             }
 
         }
     }
 
-    if(inputs_.getPressedKeys()[SDL_SCANCODE_X] || inputs_.getPressedMouseButtons()[SDL_BUTTON_MIDDLE])
+    /*if(inputs_.getPressedKeys()[SDL_SCANCODE_X] || inputs_.getPressedMouseButtons()[SDL_BUTTON_MIDDLE])
     {
         auto it = std::find_if(world_map_.begin(), world_map_.end(),
                                     [&mouse_coordinates_in_tiles](const Tile& obj) -> bool
@@ -178,7 +194,7 @@ void Game::update(SDL_Event& event)
             solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = false;
         }
 
-    }
+    }*/
 
     if(inputs_.getPressedKeys()[SDL_SCANCODE_F] && SDL_GetTicks() - last_time_npc_creation_ > 150)
     {
@@ -195,6 +211,17 @@ void Game::update(SDL_Event& event)
             selected_npc_->setGoal(mouse_coordinates_in_tiles);
             findPath(*selected_npc_);
             selected_npc_->setTimeOfLastOrder(SDL_GetTicks());
+
+            //finding the tile at the goal
+            auto it = find_if(world_map_.begin(), world_map_.end(),
+                              [mouse_coordinates_in_tiles](const std::shared_ptr<Tile> tile) -> bool
+                              {
+                                  return tile->getPosition() == mouse_coordinates_in_tiles;
+                              });
+
+
+            if((*it)->getType() == TREE)
+                selected_npc_->cutWood(std::dynamic_pointer_cast<Tree>(*it));
         }
         /*for(auto &peasant : npcs_list_)
         {

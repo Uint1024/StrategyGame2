@@ -18,7 +18,9 @@ class Window
         SDL_Rect getRect() const;
         void receiveInputs(Inputs& inputs);
         void render(Graphics& graphics);
-
+        void moveComponents(Point movement);
+        TILE_TYPE clickedOnIcon(Point mouse_pos);
+        Icon* getSelectedIcon() const;
     protected:
         Point position_;
         Dimension size_;
@@ -27,6 +29,7 @@ class Window
         Color color_;
         SDL_Rect rect_;
         std::vector<Icon> icons_list_;
+        Icon* selected_icon_;
     private:
 
 };

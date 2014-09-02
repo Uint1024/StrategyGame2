@@ -1,11 +1,13 @@
 #ifndef PEASANT_H
 #define PEASANT_H
 #include <vector>
+#include <memory>
 #include <iostream>
 #include "Entity.h"
 #include "Coordinate.h"
 #include "Tile.h"
 #include "time.h"
+class Tree;
 class Peasant : public Entity
 {
     public:
@@ -23,6 +25,7 @@ class Peasant : public Entity
         void move(std::vector<Peasant>& npc_list);
         void newRandomGoal();
         int getRandomGoalsTried();
+        void cutWood(std::shared_ptr<Tree> tree);
     protected:
     private:
         Point next_position_;
