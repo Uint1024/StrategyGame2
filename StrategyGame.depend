@@ -414,13 +414,14 @@
 	"Coordinate.h"
 	<iostream>
 
-1409703480 c:\users\john\documents\github\strategygame\include\coordinate.h
+1409763498 c:\users\john\documents\github\strategygame\include\coordinate.h
 	<SDL.h>
 
-1409705278 source:c:\users\john\documents\github\strategygame\src\game.cpp
+1409785003 source:c:\users\john\documents\github\strategygame\src\game.cpp
 	"Game.h"
 	"Tree.h"
 	"Stockpile.h"
+	"Blueprint.h"
 
 1409702741 c:\users\john\documents\github\strategygame\include\game.h
 	<SDL.h>
@@ -463,7 +464,7 @@
 	<cstdlib>
 	"GameObject.h"
 
-1409522648 c:\users\john\documents\github\strategygame\include\inputs.h
+1409785115 c:\users\john\documents\github\strategygame\include\inputs.h
 	<SDL.h>
 	<iostream>
 	<map>
@@ -481,7 +482,7 @@
 1409700932 source:c:\users\john\documents\github\strategygame\src\graphics.cpp
 	"Graphics.h"
 
-1409699680 source:c:\users\john\documents\github\strategygame\src\inputs.cpp
+1409784194 source:c:\users\john\documents\github\strategygame\src\inputs.cpp
 	"Inputs.h"
 
 1409528759 source:c:\users\john\documents\github\strategygame\src\main.cpp
@@ -514,7 +515,7 @@
 	"Inputs.h"
 	"Icon.h"
 
-1409703102 source:c:\users\john\documents\github\strategygame\src\window.cpp
+1409757899 source:c:\users\john\documents\github\strategygame\src\window.cpp
 	"Window.h"
 	"Graphics.h"
 
@@ -527,11 +528,12 @@
 	"Graphics.h"
 	"Config.h"
 
-1409706421 source:c:\users\john\documents\github\strategygame\src\peasant.cpp
+1409770599 source:c:\users\john\documents\github\strategygame\src\peasant.cpp
 	"Peasant.h"
 	"Tree.h"
+	"Blueprint.h"
 
-1409706406 c:\users\john\documents\github\strategygame\include\peasant.h
+1409765298 c:\users\john\documents\github\strategygame\include\peasant.h
 	<vector>
 	<memory>
 	<iostream>
@@ -557,7 +559,7 @@
 1409611738 source:c:\users\john\documents\github\strategygame\src\icon.cpp
 	"Icon.h"
 
-1409702882 source:c:\users\john\documents\github\strategygame\src\tree.cpp
+1409756910 source:c:\users\john\documents\github\strategygame\src\tree.cpp
 	"Tree.h"
 	"Peasant.h"
 	<iostream>
@@ -575,9 +577,17 @@
 1409702758 source:c:\users\john\documents\github\strategygame\src\gameobject.cpp
 	"GameObject.h"
 
-1409704520 source:c:\users\john\documents\github\strategygame\src\stockpile.cpp
+1409765732 source:c:\users\john\documents\github\strategygame\src\stockpile.cpp
 	"Stockpile.h"
+	"Peasant.h"
 
-1409706371 c:\users\john\documents\github\strategygame\include\stockpile.h
+1409764499 c:\users\john\documents\github\strategygame\include\stockpile.h
+	"GameObject.h"
+
+1409767863 source:c:\users\john\documents\github\strategygame\src\blueprint.cpp
+	"Blueprint.h"
+
+1409767299 c:\users\john\documents\github\strategygame\include\blueprint.h
+	<iostream>
 	"GameObject.h"
 

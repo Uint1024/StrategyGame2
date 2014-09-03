@@ -2,7 +2,7 @@
 #include "Peasant.h"
 #include <iostream>
 
-Tree::Tree(Point position) : GameObject(position, Dimension{20,20}, true, TREE, "tree.png"), wood_(4)
+Tree::Tree(Point position) : GameObject(position, Dimension{20,20}, true, TREE, "tree.png"), wood_(10)
 {
     //ctor
 }
@@ -24,8 +24,8 @@ bool Tree::update()
 
 int Tree::mineRessources(Peasant* npc)
 {
-    npc->addWood(1);
-    wood_ -= 1;
+    npc->addWood(10);
+    wood_ -= 10;
 
     return wood_;
 }

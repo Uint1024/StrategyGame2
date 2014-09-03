@@ -8,6 +8,8 @@ class Stockpile : public GameObject
         Stockpile(Point position);
         virtual ~Stockpile();
         void storeRessources(Peasant* peasant);
+        int getWood() const;
+        void takeWood(Peasant* peasant);
     protected:
         int wood_;
     private:

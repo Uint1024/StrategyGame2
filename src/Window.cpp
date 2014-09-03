@@ -3,7 +3,7 @@
 Window::Window(Point position, Dimension size, bool visible, Color color) : position_(position), size_(size), visible_(visible), color_(color)
 {
     icons_list_.push_back(Icon{position_ + Point{5,5}, "peasant.png", PEASANT});
-    icons_list_.push_back(Icon{position_ + Point{25,5}, "wall.png", WALL});
+    icons_list_.push_back(Icon{position_ + Point{25,5}, "wood_wall_blueprint.png", WOOD_WALL_BLUEPRINT});
     icons_list_.push_back(Icon{position_ + Point{45,5}, "plains.png", PLAINS});
     icons_list_.push_back(Icon{position_ + Point{65,5}, "tree.png", TREE});
     icons_list_.push_back(Icon{position_ + Point{85,5}, "stockpile.png", STOCKPILE});

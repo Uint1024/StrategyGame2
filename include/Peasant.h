@@ -31,13 +31,16 @@ class Peasant : public GameObject
         void newRandomGoal();
         int getRandomGoalsTried();
         void cutWood(std::shared_ptr<Tree> tree);
-        void setRessourceGoal(std::shared_ptr<Tree> tree);
+        void setObjectGoal(std::shared_ptr<GameObject> object);
         void emptyInventory();
         void addWood(const int quantity);
-        std::shared_ptr<Tree> getRessourceGoal() const; //object to mine, cut, or work on
-        std::shared_ptr<Stockpile> getStockpileGoal() const;
-        void findClosestTree(std::vector<std::shared_ptr<GameObject>> (&world_map)[2]);
+        //std::shared_ptr<Tree> setObjectGoal() const; //object to mine, cut, or work on
+        std::shared_ptr<GameObject> getObjectGoal() const;
+        void findClosest(std::vector<std::shared_ptr<GameObject>> (&world_map)[2], TILE_TYPE object_to_find);
         int getWood() const;
+        int getMaxWood() const;
+        int getNeededWood() const;
+
     protected:
     private:
         Point next_position_;
@@ -46,12 +49,16 @@ class Peasant : public GameObject
         Uint16 position_in_pathfinding_;
         Uint32 time_of_last_order_;
         int random_goals_tried;
-        std::shared_ptr<Tree> ressource_goal_; //object to mine, cut, or work on
-        std::shared_ptr<Stockpile> stockpile_goal_;
+        //std::shared_ptr<Tree> ressource_goal_; //object to mine, cut, or work on
+        //std::shared_ptr<Stockpile> stockpile_goal_;
+        std::shared_ptr<GameObject> object_goal_;
+        std::shared_ptr<GameObject> building_goal_;
         int wood_;
         DIRECTION position_to_goal_;
         ACTIVITY current_activity_;
         ACTIVITY previous_activity_;
+        int needed_wood_;
+        int max_wood_;
 
 };
 

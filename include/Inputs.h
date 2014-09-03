@@ -17,6 +17,8 @@ class Inputs
         void keyDownEvent(const SDL_Event& event);
         void keyUpEvent(const SDL_Event& event);
         std::map<SDL_Scancode, bool> getPressedKeys() const;
+        std::map<SDL_Scancode, bool> getHeldKeys() const;
+        std::map<int, bool> getHeldMouseButtons() const;
         std::map<int, bool> getPressedMouseButtons() const;
         //std::map<SDL_Scancode, bool> getPressedKeysLastFrame() const;
         void mouseButtonDownEvent(const SDL_Event& event);
@@ -29,6 +31,7 @@ class Inputs
         void calculateMouseTravel(const SDL_Event& event);
         void setLockedWindow(Window* windo);
         float getTimeSinceLastRightClick() const;
+        void update();
 
     protected:
     private:
@@ -42,6 +45,14 @@ class Inputs
         Window* cursor_locked_on_;
         Peasant* selected_npc_;
         float last_right_click_;
+
+        Point mouse_selection_start;
+        Point mouse_selection_end;
+
+        int left_click_duration_;
+        int left_click_start_;
+        bool left_click_started_;
+        bool selection_has_started_;
 };
 
 #endif // INPUTS_H

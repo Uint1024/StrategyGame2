@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Tree.h"
 #include "Stockpile.h"
+#include "Blueprint.h"
 
 Game::Game() : config_(), graphics_(), world_editor_{new Window{Point{10,10}, Dimension{100,100}, true, Color{200,200,200}}},
                 selected_npc_(nullptr)
@@ -71,7 +72,7 @@ void Game::gameLoop()
 
 void Game::update(SDL_Event& event)
 {
-
+    inputs_.update();
     inputs_.calculateMouseTravel(event);
     while(SDL_PollEvent(&event))
     {
@@ -106,6 +107,11 @@ void Game::update(SDL_Event& event)
         }
 
     }
+
+    if(inputs_.getHeldMouseButtons()[SDL_BUTTON_LEFT])
+        std::cout << "held left mouse button" << std::endl;
+    else
+        std::cout << "NOT held left mouse button" << std::endl;
 
     //mouse coordinates on the world map (NOT on the screen)
     Point mouse_coords = inputs_.getMouseCoordinatesInPixels() + graphics_.getCamera().getPosition();
@@ -148,25 +154,23 @@ void Game::update(SDL_Event& event)
             {
                 if(current_selected_world_editor_object_ != EMPTY)
                 {
-                    if(current_selected_world_editor_object_ == WALL)
+                    if(current_selected_world_editor_object_ == WOOD_WALL_BLUEPRINT)
                     {
-                        world_map_[1][mouse_position_in_vector] = std::make_shared<Wall>(mouse_coordinates_in_tiles);
-                        //solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
+                        world_map_[1][mouse_position_in_vector] = std::make_shared<Blueprint>(mouse_coordinates_in_tiles,
+                                                                                              current_selected_world_editor_object_,
+                                                                                              "wood_wall_blueprint.png");
                     }
                     else if(current_selected_world_editor_object_ == PLAINS)
                     {
                         world_map_[0][mouse_position_in_vector] = std::make_shared<Plains>(mouse_coordinates_in_tiles);
-                        //solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = false;
                     }
                     else if(current_selected_world_editor_object_ == TREE)
                     {
                         world_map_[1][mouse_position_in_vector] = std::make_shared<Tree>(mouse_coordinates_in_tiles);
-                        //solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
                     }
                     else if(current_selected_world_editor_object_ == STOCKPILE)
                     {
                         world_map_[1][mouse_position_in_vector] = std::make_shared<Stockpile>(mouse_coordinates_in_tiles);
-                        //solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
                     }
                 }
             }
@@ -198,7 +202,7 @@ void Game::update(SDL_Event& event)
                 {
                     if(world_map_[1][mouse_position_in_vector]->getType() == TREE)
                     {
-                        selected_npc_->setRessourceGoal(std::dynamic_pointer_cast<Tree>(world_map_[1][mouse_position_in_vector]));
+                        selected_npc_->setObjectGoal(world_map_[1][mouse_position_in_vector]);
                     }
                 }
 
@@ -251,7 +255,7 @@ void Game::update(SDL_Event& event)
 
     }
 
-//for (auto it = aVector.begin(); it != aVector.end(); ++it) {
+
     for(auto it = world_map_[1].begin() ; it != world_map_[1].end() ; ++it)
     {
         if((*it) != nullptr)
@@ -263,6 +267,12 @@ void Game::update(SDL_Event& event)
                 {
                     (*it) = nullptr;
                 }
+            }
+
+            else if((*it)->getType() == WOOD_WALL_BLUEPRINT &&
+               std::dynamic_pointer_cast<Blueprint>((*it))->isBuilt())
+            {
+               (*it) = std::make_shared<Wall>((*it)->getPosition());
             }
         }
     }
@@ -320,6 +330,7 @@ bool Game::findPath(Peasant& peasant)
     open_nodes_map[x][y]=n0->getFScore(); // mark it on the open nodes map
 
     searched_tiles = 0;
+    delete n0;
     // A* search
     while(!pq[pqi].empty())
     {
@@ -404,8 +415,7 @@ bool Game::findPath(Peasant& peasant)
                     tile_is_solid = tile_at_new_pos->isSolid();
 
 
-                    if(tile_at_new_pos == peasant.getRessourceGoal() ||
-                       tile_at_new_pos == peasant.getStockpileGoal())
+                    if(tile_at_new_pos == peasant.getObjectGoal())
                     {
                         std::vector<DIRECTION> pathfinding_vector;
 
@@ -450,6 +460,7 @@ bool Game::findPath(Peasant& peasant)
                     pq[pqi].push(*m0);
                     // mark its parent node direction
                     dir_map[new_pos.x][new_pos.y]=(i+8/2)%8;
+                    delete m0;
 
                 }
                 else if(open_nodes_map[new_pos.x][new_pos.y]>m0->getFScore())
@@ -480,6 +491,7 @@ bool Game::findPath(Peasant& peasant)
                     }
                     pqi=1-pqi;
                     pq[pqi].push(*m0); // add the better node instead
+                    delete m0;
                 }
                 else delete m0; // garbage collection
             }
