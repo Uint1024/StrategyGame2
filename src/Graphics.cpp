@@ -21,7 +21,7 @@ Graphics::~Graphics()
     SDL_DestroyRenderer(sdl_renderer_);
 }
 
-void Graphics::drawTiles(Config& config, std::vector<std::shared_ptr<Tile>> (&world_map)[2],
+void Graphics::drawTiles(Config& config, std::vector<std::shared_ptr<GameObject>> (&world_map)[2],
                           std::vector<Node*>& pathfinding_nodes)
 {
 

@@ -17,8 +17,6 @@ void Inputs::keyDownEvent(const SDL_Event& event)
     {
         pressed_keys_[event.key.keysym.scancode] = false;
         held_keys_[event.key.keysym.scancode] = true;
-
-        std::cout << pressed_keys_[SDL_SCANCODE_F] << std::endl;
     }
     else
     {

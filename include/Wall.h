@@ -1,9 +1,9 @@
 #ifndef WALL_H
 #define WALL_H
 #include "Coordinate.h""
-#include "Tile.h"
+#include "GameObject.h"
 
-class Wall : public Tile
+class Wall : public GameObject
 {
     public:
         Wall(Point position);

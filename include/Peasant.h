@@ -7,11 +7,12 @@
 #include <cstdlib>
 #include "Entity.h"
 #include "Coordinate.h"
-#include "Tile.h"
+#include "GameObject.h"
 #include "time.h"
+#include "Stockpile.h"
 
 class Tree;
-class Peasant : public Entity
+class Peasant : public GameObject
 {
     public:
         Peasant(Point position);
@@ -25,14 +26,18 @@ class Peasant : public Entity
         Uint32 getTimeOfLastOrder() const;
         void calculateMovement(std::vector<Peasant>& npc_list);
         Point getNextPosition() const;
-        void update(std::vector<Peasant>& npc_list, std::vector<std::shared_ptr<Tile>> (&world_map)[2]);
+        void update(std::vector<Peasant>& npc_list, std::vector<std::shared_ptr<GameObject>> (&world_map)[2]);
+        void findClosestStockpile(std::vector<std::shared_ptr<GameObject>> (&world_map)[2]);
         void newRandomGoal();
         int getRandomGoalsTried();
         void cutWood(std::shared_ptr<Tree> tree);
         void setRessourceGoal(std::shared_ptr<Tree> tree);
+        void emptyInventory();
         void addWood(const int quantity);
         std::shared_ptr<Tree> getRessourceGoal() const; //object to mine, cut, or work on
-        void findClosestTree(std::vector<std::shared_ptr<Tile>> (&world_map)[2]);
+        std::shared_ptr<Stockpile> getStockpileGoal() const;
+        void findClosestTree(std::vector<std::shared_ptr<GameObject>> (&world_map)[2]);
+        int getWood() const;
     protected:
     private:
         Point next_position_;
@@ -42,8 +47,12 @@ class Peasant : public Entity
         Uint32 time_of_last_order_;
         int random_goals_tried;
         std::shared_ptr<Tree> ressource_goal_; //object to mine, cut, or work on
+        std::shared_ptr<Stockpile> stockpile_goal_;
         int wood_;
         DIRECTION position_to_goal_;
+        ACTIVITY current_activity_;
+        ACTIVITY previous_activity_;
+
 };
 
 #endif // PEASANT_H

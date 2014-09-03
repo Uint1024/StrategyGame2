@@ -22,7 +22,7 @@ class Graphics
 
         void flip();
         void clear();
-        void drawTiles(Config& config, std::vector<std::shared_ptr<Tile>> (&world_map)[2], std::vector<Node*>& pathfinding_nodes);
+        void drawTiles(Config& config, std::vector<std::shared_ptr<GameObject>> (&world_map)[2], std::vector<Node*>& pathfinding_nodes);
         void moveCamera(const IVector& movement);
         Camera getCamera() const;
         void drawWindow(const Window* windo, const std::vector<Icon>& icon_list);

@@ -1,6 +1,6 @@
 #include "Wall.h"
 
-Wall::Wall(Point position) : Tile(position, true, WALL, "wall.png")
+Wall::Wall(Point position) : GameObject(position, Dimension{20,20}, true, WALL, "wall.png")
 {
 }
 

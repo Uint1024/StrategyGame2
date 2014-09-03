@@ -1,9 +1,9 @@
 #ifndef PLAINS_H
 #define PLAINS_H
 
-#include "Tile.h"
+#include "GameObject.h"
 #include <SDL.h>
-class Plains : public Tile
+class Plains : public GameObject
 {
     public:
         Plains(Point position);

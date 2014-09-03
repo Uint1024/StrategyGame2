@@ -1,6 +1,13 @@
 #include "Node.h"
 
-Node::Node(Point position, Uint16 g_score, Uint16 f_score) : Tile(position, false, NODE, "node.png"), g_score_(g_score), f_score_(f_score)
+Node::Node(Point position, Uint16 g_score, Uint16 f_score) :
+                                            GameObject( position,
+                                                        Dimension{20,20},
+                                                        false,
+                                                        NODE,
+                                                        "node.png"),
+                                            g_score_(g_score),
+                                            f_score_(f_score)
 {
     //ctor
 }

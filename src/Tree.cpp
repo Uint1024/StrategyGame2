@@ -2,7 +2,7 @@
 #include "Peasant.h"
 #include <iostream>
 
-Tree::Tree(Point position) : Tile(position, true, TREE, "tree.png"), wood_(4)
+Tree::Tree(Point position) : GameObject(position, Dimension{20,20}, true, TREE, "tree.png"), wood_(4)
 {
     //ctor
 }

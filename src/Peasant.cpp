@@ -1,10 +1,13 @@
 #include "Peasant.h"
 #include "Tree.h"
 
-Peasant::Peasant(Point position) :  Entity(position, Dimension{20,20}, "peasant.png"),
+Peasant::Peasant(Point position) :  GameObject(position, Dimension{20,20}, true, PEASANT, "peasant.png"),
                                     goal_(position),
                                     ressource_goal_(nullptr),
-                                    wood_(0)
+                                    stockpile_goal_(nullptr),
+                                    wood_(0),
+                                    current_activity_(NOTHING),
+                                    previous_activity_(NOTHING)
 {
 position_in_pathfinding_ = 0;
 time_of_last_order_ = 0;
@@ -17,7 +20,7 @@ Peasant::~Peasant()
     //dtor
 }
 
-void Peasant::update(std::vector<Peasant>& npc_list, std::vector<std::shared_ptr<Tile>> (&world_map)[2])
+void Peasant::update(std::vector<Peasant>& npc_list, std::vector<std::shared_ptr<GameObject>> (&world_map)[2])
 {
     if(goal_ != position_)
     {
@@ -50,6 +53,15 @@ void Peasant::update(std::vector<Peasant>& npc_list, std::vector<std::shared_ptr
         }
     }
 
+    if(wood_ >= 10 && stockpile_goal_ == nullptr)
+    {
+        ressource_goal_ = nullptr;
+        goal_ = position_;
+        findClosestStockpile(world_map);
+        current_activity_ = STOCKPILING;
+        previous_activity_ = CUTTING_TREES;
+    }
+
     if(ressource_goal_ != nullptr)
     {
         Point diff = ressource_goal_->getPosition() - position_;
@@ -65,16 +77,37 @@ void Peasant::update(std::vector<Peasant>& npc_list, std::vector<std::shared_ptr
 
         }
     }
+
+
+
+    if(current_activity_ == STOCKPILING)
+    {
+        Point diff{ std::abs(stockpile_goal_->getPosition().x - position_.x),
+                    std::abs(stockpile_goal_->getPosition().y - position_.y)};
+        if(diff.x < 2 && diff.y < 2)
+        {
+            stockpile_goal_->storeRessources(this);
+
+            if(previous_activity_ == CUTTING_TREES)
+            {
+                current_activity_ = CUTTING_TREES;
+                previous_activity_ = STOCKPILING;
+                goal_ = position_;
+                stockpile_goal_ = nullptr;
+                findClosestTree(world_map);
+            }
+        }
+    }
 }
 
-void Peasant::findClosestTree(std::vector<std::shared_ptr<Tile>> (&world_map)[2])
+void Peasant::findClosestTree(std::vector<std::shared_ptr<GameObject>> (&world_map)[2])
 {
     std::shared_ptr<Tree> closestTree = nullptr;
     float distance_closest = 0;
     float distance = 0;
     for(auto it = world_map[1].begin() ; it != world_map[1].end() ; ++it)
     {
-        if((*it) != nullptr)
+        if((*it) != nullptr && (*it)->getType() == TREE)
         {
             Point difference;
 
@@ -100,8 +133,62 @@ void Peasant::findClosestTree(std::vector<std::shared_ptr<Tile>> (&world_map)[2]
 
     if(closestTree != nullptr)
     {
+        current_activity_ = CUTTING_TREES;
         ressource_goal_ = closestTree;
         goal_ = closestTree->getPosition();
+
+    }
+    else
+    {
+        current_activity_ = NOTHING;
+    }
+}
+
+void Peasant::emptyInventory()
+{
+    wood_ = 0;
+}
+void Peasant::findClosestStockpile(std::vector<std::shared_ptr<GameObject>> (&world_map)[2])
+{
+    std::shared_ptr<Stockpile> closest_stockpile = nullptr;
+    float distance_closest = 0;
+    float distance = 0;
+    for(auto it = world_map[1].begin() ; it != world_map[1].end() ; ++it)
+    {
+        if((*it) != nullptr && (*it)->getType() == STOCKPILE)
+        {
+            Point difference;
+
+            difference.x = std::abs(position_.x - (*it)->getPosition().x);
+            difference.y = std::abs(position_.y - (*it)->getPosition().y);
+
+            if(closest_stockpile == nullptr)
+            {
+                closest_stockpile = std::dynamic_pointer_cast<Stockpile>(*it);
+                distance_closest = (difference.x + difference.y) - 0.6f * std::min(difference.x, difference.y);
+            }
+            else
+            {
+                distance = (difference.x + difference.y) - 0.6f * std::min(difference.x, difference.y);
+                if(distance < distance_closest)
+                {
+                    closest_stockpile = std::dynamic_pointer_cast<Stockpile>(*it);
+                    distance_closest = distance;
+                }
+            }
+        }
+    }
+
+    if(closest_stockpile != nullptr)
+    {
+        stockpile_goal_ = closest_stockpile;
+        goal_ = closest_stockpile->getPosition();
+        current_activity_ = STOCKPILING;
+
+    }
+    else
+    {
+        std::cout << "no stockpile available" << std::endl;
     }
 }
 
@@ -237,5 +324,5 @@ void Peasant::setTimeOfLastOrder(const Uint32 time) {
 
 Point Peasant::getGoal() const { return goal_; }
 void Peasant::setRessourceGoal(std::shared_ptr<Tree> tree) { ressource_goal_ = tree; }
-
-
+std::shared_ptr<Stockpile> Peasant::getStockpileGoal() const { return stockpile_goal_; }
+int Peasant::getWood() const { return wood_; }

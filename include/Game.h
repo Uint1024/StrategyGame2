@@ -3,7 +3,7 @@
 #include <SDL.h>
 #include "Graphics.h"
 #include "Inputs.h"
-#include "Tile.h"
+#include "GameObject.h"
 #include "Wall.h"
 #include <vector>
 #include <memory>
@@ -28,7 +28,7 @@ class Game
         Inputs inputs_;
         Config config_;
         bool playing_;
-        std::vector<std::shared_ptr<Tile>> world_map_[2]; //2 layers of map
+        std::vector<std::shared_ptr<GameObject>> world_map_[2]; //2 layers of map
         Point start;
         Point finish;
         std::vector<Node*> pathfinding_nodes_;

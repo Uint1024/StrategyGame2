@@ -1,10 +1,10 @@
 #ifndef TREE_H
 #define TREE_H
 #include "Entity.h"
-#include "Tile.h"
+#include "GameObject.h"
 #include "Coordinate.h"
 class Peasant;
-class Tree : public Tile
+class Tree : public GameObject
 {
     public:
         Tree(Point position);

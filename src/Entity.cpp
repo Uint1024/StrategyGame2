@@ -2,7 +2,8 @@
 #include "Graphics.h"
 #include "Config.h"
 
-Entity::Entity(Point position, Dimension size, std::string texture_name) : position_(position), size_(size), texture_name_(texture_name)
+Entity::Entity(Point position, Dimension size, bool solid, TILE_TYPE type, std::string texture_name) :
+                    position_(position), size_(size), solid_(solid), texture_name_(texture_name), type_(type)
 {
     //ctor
 }
@@ -21,3 +22,5 @@ SDL_Rect Entity::getRect(Graphics& graphics_, Config& config_) const
                     size_.y};
 }
 std::string Entity::getTextureName() const { return texture_name_;}
+TILE_TYPE Entity::getType() const { return type_; }
+bool Entity::isSolid() const { return solid_; }

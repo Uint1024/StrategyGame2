@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Tree.h"
+#include "Stockpile.h"
 
 Game::Game() : config_(), graphics_(), world_editor_{new Window{Point{10,10}, Dimension{100,100}, true, Color{200,200,200}}},
                 selected_npc_(nullptr)
@@ -24,6 +25,7 @@ void Game::gameLoop()
     std::vector<DIRECTION> direc = {UP, LEFT, UP_LEFT, UP, UP_RIGHT, RIGHT};
     //peasant1.setPathfinding(direc);
     npcs_list_.push_back(peasant1);
+    selected_npc_ = &npcs_list_[0];
     start = {0,0};
     finish = {0,0};
     chrono_for_pathfinding_ = 0;
@@ -146,26 +148,25 @@ void Game::update(SDL_Event& event)
             {
                 if(current_selected_world_editor_object_ != EMPTY)
                 {
-                   /*auto it = std::find_if(world_map_.begin(), world_map_.end(),
-                                        [&mouse_coordinates_in_tiles](const std::shared_ptr<Tile>& obj) -> bool
-                                        {
-                                            (mouse_coordinates_in_tiles == obj->getPosition());
-                                        });*/
-
                     if(current_selected_world_editor_object_ == WALL)
                     {
                         world_map_[1][mouse_position_in_vector] = std::make_shared<Wall>(mouse_coordinates_in_tiles);
-                        solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
+                        //solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
                     }
                     else if(current_selected_world_editor_object_ == PLAINS)
                     {
                         world_map_[0][mouse_position_in_vector] = std::make_shared<Plains>(mouse_coordinates_in_tiles);
-                        solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = false;
+                        //solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = false;
                     }
                     else if(current_selected_world_editor_object_ == TREE)
                     {
                         world_map_[1][mouse_position_in_vector] = std::make_shared<Tree>(mouse_coordinates_in_tiles);
-                        solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
+                        //solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
+                    }
+                    else if(current_selected_world_editor_object_ == STOCKPILE)
+                    {
+                        world_map_[1][mouse_position_in_vector] = std::make_shared<Stockpile>(mouse_coordinates_in_tiles);
+                        //solid_map_[mouse_coordinates_in_tiles.x + mouse_coordinates_in_tiles.y * config_.getMapSize().y] = true;
                     }
                 }
             }
@@ -204,16 +205,6 @@ void Game::update(SDL_Event& event)
                 selected_npc_->setGoal(mouse_coordinates_in_tiles);
                 findPath(*selected_npc_);
                 selected_npc_->setTimeOfLastOrder(SDL_GetTicks());
-
-                //finding the tile at the goal
-                /*auto it = find_if(world_map_.begin(), world_map_.end(),
-                                  [mouse_coordinates_in_tiles](const std::shared_ptr<Tile> tile) -> bool
-                                  {
-                                      return tile->getPosition() == mouse_coordinates_in_tiles;
-                                  });*/
-
-
-
             }
         }
 
@@ -404,7 +395,7 @@ bool Game::findPath(Peasant& peasant)
             bool tile_is_solid = false;
             if(!(new_pos.x<0 || new_pos.x>99 || new_pos.y<0 || new_pos.y>99))
             {
-                std::shared_ptr<Tile> tile_at_new_pos = world_map_[1][new_pos.y * config_.getMapSize().y + new_pos.x];
+                std::shared_ptr<GameObject> tile_at_new_pos = world_map_[1][new_pos.y * config_.getMapSize().y + new_pos.x];
 
 
                 if(tile_at_new_pos!= nullptr)
@@ -413,7 +404,8 @@ bool Game::findPath(Peasant& peasant)
                     tile_is_solid = tile_at_new_pos->isSolid();
 
 
-                    if(tile_at_new_pos == peasant.getRessourceGoal())
+                    if(tile_at_new_pos == peasant.getRessourceGoal() ||
+                       tile_at_new_pos == peasant.getStockpileGoal())
                     {
                         std::vector<DIRECTION> pathfinding_vector;
 

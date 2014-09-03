@@ -4,10 +4,10 @@
 #include <SDL.h>
 #include <math.h>
 #include <cstdlib>
-#include "Tile.h"
+#include "GameObject.h"
 /*Node for the pathfinding algorithm*/
 
-class Node : public Tile
+class Node : public GameObject
 {
     public:
         Node(Point position, Uint16 g_score, Uint16 f_score);
