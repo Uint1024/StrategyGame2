@@ -7,6 +7,7 @@
 #include "Coordinate.h"
 #include "Game.h"
 #include "time.h"
+#include <SDL_ttf.h>
 #define TAU 6.2831853071
 
 #undef main
@@ -20,10 +21,14 @@ int main()
     {
         printf("Could not initialize SDL: %s.\n", SDL_GetError());
     }
+     TTF_Init();
 
     Game game_;
 
     std::cout << "Bye" << std::endl;
+
+    TTF_Quit();
+    SDL_Quit();
 
     return 0;
 }

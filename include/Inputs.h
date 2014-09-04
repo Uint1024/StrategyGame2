@@ -31,7 +31,9 @@ class Inputs
         void calculateMouseTravel(const SDL_Event& event);
         void setLockedWindow(Window* windo);
         float getTimeSinceLastRightClick() const;
-        void update();
+        void update(const SDL_Event& event);
+        Point getMouseSelectionStart() const;
+        Point getMouseSelectionEnd() const;
 
     protected:
     private:

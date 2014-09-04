@@ -414,10 +414,10 @@
 	"Coordinate.h"
 	<iostream>
 
-1409763498 c:\users\john\documents\github\strategygame\include\coordinate.h
+1409798660 c:\users\john\documents\github\strategygame\include\coordinate.h
 	<SDL.h>
 
-1409785003 source:c:\users\john\documents\github\strategygame\src\game.cpp
+1409803618 source:c:\users\john\documents\github\strategygame\src\game.cpp
 	"Game.h"
 	"Tree.h"
 	"Stockpile.h"
@@ -437,12 +437,13 @@
 	"Plains.h"
 	"Window.h"
 
-1409700625 c:\users\john\documents\github\strategygame\include\graphics.h
+1409802821 c:\users\john\documents\github\strategygame\include\graphics.h
 	<SDL.h>
 	<iostream>
 	<vector>
 	<SDL_image.h>
 	<stdio.h>
+	<SDL_ttf.h>
 	<memory>
 	"Coordinate.h"
 	"Config.h"
@@ -450,6 +451,7 @@
 	"Camera.h"
 	"Window.h"
 	"Peasant.h"
+	"Inputs.h"
 
 1409533803 c:\users\john\documents\github\strategygame\include\config.h
 
@@ -464,7 +466,7 @@
 	<cstdlib>
 	"GameObject.h"
 
-1409785115 c:\users\john\documents\github\strategygame\include\inputs.h
+1409790275 c:\users\john\documents\github\strategygame\include\inputs.h
 	<SDL.h>
 	<iostream>
 	<map>
@@ -479,13 +481,13 @@
 	"GameObject.h"
 	<SDL.h>
 
-1409700932 source:c:\users\john\documents\github\strategygame\src\graphics.cpp
+1409803701 source:c:\users\john\documents\github\strategygame\src\graphics.cpp
 	"Graphics.h"
 
-1409784194 source:c:\users\john\documents\github\strategygame\src\inputs.cpp
+1409798688 source:c:\users\john\documents\github\strategygame\src\inputs.cpp
 	"Inputs.h"
 
-1409528759 source:c:\users\john\documents\github\strategygame\src\main.cpp
+1409801910 source:c:\users\john\documents\github\strategygame\src\main.cpp
 	<SDL.h>
 	<iostream>
 	<stdio.h>
@@ -494,6 +496,7 @@
 	"Coordinate.h"
 	"Game.h"
 	"time.h"
+	<SDL_ttf.h>
 
 1409358159 c:\users\john\documents\github\strategygame\include\main.h
 	"graphics.h"
@@ -533,7 +536,7 @@
 	"Tree.h"
 	"Blueprint.h"
 
-1409765298 c:\users\john\documents\github\strategygame\include\peasant.h
+1409793091 c:\users\john\documents\github\strategygame\include\peasant.h
 	<vector>
 	<memory>
 	<iostream>
@@ -590,4 +593,9 @@
 1409767299 c:\users\john\documents\github\strategygame\include\blueprint.h
 	<iostream>
 	"GameObject.h"
+
+1376156543 c:\i686-w64-mingw32\include\sdl2\sdl_ttf.h
+	"SDL.h"
+	"begin_code.h"
+	"close_code.h"
 

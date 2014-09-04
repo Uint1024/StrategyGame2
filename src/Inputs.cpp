@@ -6,6 +6,9 @@ Inputs::Inputs() : cursor_locked_on_(nullptr)
     left_click_duration_ = 0;
     left_click_start_ = 0;
     left_click_started_ = false;
+    mouse_selection_start = {0,0};
+    mouse_selection_end = {0,0};
+    selection_has_started_ = false;
 }
 
 Inputs::~Inputs()
@@ -16,7 +19,7 @@ Inputs::~Inputs()
 
 void Inputs::keyDownEvent(const SDL_Event& event)
 {
-    if(pressed_keys_[event.key.keysym.scancode] == true)
+    /*if(pressed_keys_[event.key.keysym.scancode] == true)
     {
         pressed_keys_[event.key.keysym.scancode] = false;
         held_keys_[event.key.keysym.scancode] = true;
@@ -25,8 +28,8 @@ void Inputs::keyDownEvent(const SDL_Event& event)
     {
         pressed_keys_[event.key.keysym.scancode] = true;
         held_keys_[event.key.keysym.scancode] = false;
-    }
-
+    }*/
+pressed_keys_[event.key.keysym.scancode] = true;
 }
 
 void Inputs::keyUpEvent(const SDL_Event& event)
@@ -48,9 +51,35 @@ void Inputs::mouseButtonDownEvent(const SDL_Event& event)
 
 }
 
-void Inputs::update()
+void Inputs::update(const SDL_Event& event)
 {
-    if(pressed_mouse_buttons_[SDL_BUTTON_LEFT])
+    mouse_travel_ = Point{event.button.x, event.button.y} - mouse_coordinates_in_pixels;
+    if(event.motion.x > 0 && event.motion.x < 2000 && event.motion.y > 0 && event.motion.y < 2000)
+        mouse_coordinates_in_pixels = {event.motion.x, event.motion.y};
+
+    if(pressed_keys_[SDL_SCANCODE_LSHIFT] && pressed_mouse_buttons_[SDL_BUTTON_LEFT])
+    {
+        held_mouse_buttons[SDL_BUTTON_LEFT] = true;
+        if(!selection_has_started_)
+        {
+            selection_has_started_ = true;
+            mouse_selection_start = mouse_coordinates_in_pixels;
+            mouse_selection_end = mouse_coordinates_in_pixels;
+        }
+        else
+        {
+            mouse_selection_end = mouse_coordinates_in_pixels;
+        }
+
+    }
+    else
+    {
+        selection_has_started_ = false;
+    }
+
+
+
+    /*if(pressed_mouse_buttons_[SDL_BUTTON_LEFT])
         left_click_duration_ = SDL_GetTicks() - left_click_start_;
 
     if(left_click_duration_ > 100)
@@ -59,12 +88,14 @@ void Inputs::update()
         if(selection_has_started_ == false)
         {
             mouse_selection_start = mouse_coordinates_in_pixels;
+            mouse_selection_end = mouse_coordinates_in_pixels;
         }
         else
         {
             mouse_selection_end = mouse_coordinates_in_pixels;
         }
-    }
+        selection_has_started_ = true;
+    }*/
 }
 
 void Inputs::mouseMotionEvent(const SDL_Event& event) {}
@@ -91,7 +122,7 @@ void Inputs::calculateMouseTravel(const SDL_Event& event)
 {
     mouse_travel_ = Point{event.button.x, event.button.y} - mouse_coordinates_in_pixels;
     mouse_coordinates_in_pixels = {event.motion.x, event.motion.y};
-
+    //std::cout << event.motion.x << std::endl;
 }
 
 Window* Inputs::getLockedWindow() const { return cursor_locked_on_; }
@@ -102,3 +133,5 @@ std::map<int, bool> Inputs::getPressedMouseButtons() const { return pressed_mous
 std::map<int, bool> Inputs::getHeldMouseButtons() const { return held_mouse_buttons; }
 Point Inputs::getMouseTravel() const { return mouse_travel_; }
 std::map<SDL_Scancode, bool> Inputs::getHeldKeys() const { return held_keys_; }
+Point Inputs::getMouseSelectionStart() const { return mouse_selection_start; }
+Point Inputs::getMouseSelectionEnd() const { return mouse_selection_end; }

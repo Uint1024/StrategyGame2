@@ -9,7 +9,8 @@ Graphics::Graphics() :  window_size_{1000,1000},
                                     sdl_window_, 0,
                                     SDL_RENDERER_ACCELERATED |
                                     SDL_RENDERER_PRESENTVSYNC |
-                                    SDL_RENDERER_TARGETTEXTURE)}
+                                    SDL_RENDERER_TARGETTEXTURE)},
+                        font(TTF_OpenFont("arial.ttf", 25))
 
 {
     std::cout << "graphics initialized" << std::endl;
@@ -19,6 +20,84 @@ Graphics::~Graphics()
 {
     SDL_DestroyWindow(sdl_window_);
     SDL_DestroyRenderer(sdl_renderer_);
+}
+
+void Graphics::drawInputs(Inputs& inputs)
+{
+
+    if(inputs.getHeldMouseButtons()[SDL_BUTTON_LEFT])
+    {
+        SDL_SetRenderDrawColor(sdl_renderer_, 200, 200, 150, 250);
+        Point diff = inputs.getMouseSelectionEnd() - inputs.getMouseSelectionStart();
+
+        if(diff.x > 0 && diff.y > 0)
+        {
+           SDL_Rect* rect = new SDL_Rect{   inputs.getMouseSelectionStart().x,
+                                            inputs.getMouseSelectionStart().y,
+                                            diff.x,
+                                            diff.y};
+            SDL_RenderDrawRect(sdl_renderer_, rect);
+
+            delete rect;
+
+
+        }
+        else if (diff.x < 0 && diff.y > 0)
+        {
+            SDL_Rect* rect = new SDL_Rect{  inputs.getMouseSelectionStart().x + diff.x,
+                                            inputs.getMouseSelectionStart().y,
+                                            -diff.x,
+                                            diff.y};
+
+            SDL_RenderDrawRect(sdl_renderer_, rect);
+
+            delete rect;
+        }
+        else if (diff.x < 0 && diff.y < 0)
+        {
+            SDL_Rect* rect = new SDL_Rect{  inputs.getMouseSelectionStart().x + diff.x,
+                                            inputs.getMouseSelectionStart().y + diff.y,
+                                            -diff.x,
+                                            -diff.y};
+
+            SDL_RenderDrawRect(sdl_renderer_, rect);
+
+            delete rect;
+        }
+        else if (diff.x > 0 && diff.y < 0)
+        {
+            SDL_Rect* rect = new SDL_Rect{  inputs.getMouseSelectionStart().x,
+                                            inputs.getMouseSelectionStart().y + diff.y,
+                                            diff.x,
+                                            -diff.y};
+
+            SDL_RenderDrawRect(sdl_renderer_, rect);
+
+            delete rect;
+        }
+
+
+    }
+
+if( font == NULL )
+    {
+        printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
+
+    }
+
+    SDL_Surface* surface = TTF_RenderText_Solid(font, "HELLdfsdfsdfsdgsfgsdO", SDL_Color{255, 255, 255});
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(sdl_renderer_, surface);
+
+std::cout << "wtf";
+    int texW = 0;
+    int texH = 0;
+    SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
+    SDL_Rect dstrect = {10, 400, texW, texH};
+
+    SDL_RenderCopy(sdl_renderer_, texture, NULL, &dstrect);
+
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
 }
 
 void Graphics::drawTiles(Config& config, std::vector<std::shared_ptr<GameObject>> (&world_map)[2],
@@ -70,16 +149,6 @@ void Graphics::drawTiles(Config& config, std::vector<std::shared_ptr<GameObject>
         }
     }
 
-
-    /*for(auto node : pathfinding_nodes)
-    {
-        SDL_SetRenderDrawColor(sdl_renderer_, 0x00, 0xFF, 0x00, 0xFF);
-        SDL_Rect* node_rect = new SDL_Rect{ node->getPosition().x * config.getTileSize().x,
-                                                node->getPosition().y * config.getTileSize().y,
-                                                config.getTileSize().x, config.getTileSize().y};
-        SDL_RenderFillRect(sdl_renderer_, node_rect);
-
-    }*/
 
     SDL_SetRenderDrawColor(sdl_renderer_, 0x00, 0x00, 0x00, 0xFF);
 
@@ -136,29 +205,11 @@ void Graphics::drawWindow(const Window* windo, const std::vector<Icon>& icon_lis
     }
 }
 
-void Graphics::drawNodes(int (&open_nodes_map)[200][200], int (&closed_nodes_map)[200][200])
-{
-    /*SDL_SetRenderDrawColor(sdl_renderer_, 0x00, 0xFF, 0xAA, 0xFF);
-    for(int i = 0 ; i < 200 ; i++)
-    {
-        for(int j = 0 ; j < 200 ; j++)
-        {
-            if(open_nodes_map[i][j] == 1)
-            {
-                 SDL_Rect* rect = new SDL_Rect{i * 20 - camera_.getPosition().x, j * 20 - camera_.getPosition().y, 5, 5};
-                 SDL_RenderFillRect(sdl_renderer_, rect);
-
-                delete rect;
-            }
-
-        }
-    }*/
-}
-void Graphics::drawNpcs(Config& config, std::vector<Peasant>& npcs_list)
+void Graphics::drawNpcs(Config& config, std::vector<Peasant>& npcs_list, Peasant* selected_npc)
 {
 
 
-    for(auto npc : npcs_list)
+    for(auto &npc : npcs_list)
     {
         Point npc_position = npc.getPosition() * config.getTileSize() - camera_.getPosition();
 
@@ -174,6 +225,12 @@ void Graphics::drawNpcs(Config& config, std::vector<Peasant>& npcs_list)
 
         SDL_RenderCopy(sdl_renderer_, loadImage(npc.getTextureName()), src_rect, dest_rect);
 
+
+        if(&npc == selected_npc)
+        {
+            SDL_SetRenderDrawColor(sdl_renderer_, 150, 100, 10, 250);
+            SDL_RenderDrawRect(sdl_renderer_, dest_rect);
+        }
         delete src_rect;
         delete dest_rect;
 

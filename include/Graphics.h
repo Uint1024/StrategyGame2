@@ -5,6 +5,7 @@
 #include <vector>
 #include <SDL_image.h>
 #include <stdio.h>
+#include <SDL_ttf.h>
 #include <memory>
 #include "Coordinate.h"
 #include "Config.h"
@@ -13,6 +14,7 @@
 #include "Camera.h"
 #include "Window.h"
 #include "Peasant.h"
+#include "Inputs.h"
 
 class Graphics
 {
@@ -27,9 +29,10 @@ class Graphics
         Camera getCamera() const;
         void drawWindow(const Window* windo, const std::vector<Icon>& icon_list);
         void drawIcon(const Icon& icon) const;
-        void drawNpcs(Config& config, std::vector<Peasant>& npcs_list);
+        void drawNpcs(Config& config, std::vector<Peasant>& npcs_list, Peasant* selected_npc);
         void drawNodes(int (&open_nodes_map)[200][200], int (&closed_nodes_map)[200][200]);
         SDL_Texture* loadImage(std::string file_name);
+        void drawInputs(Inputs& inputs);
     protected:
     private:
         SDL_Window* sdl_window_;
@@ -37,6 +40,7 @@ class Graphics
         Dimension window_size_;
         Camera camera_;
         std::map<std::string, SDL_Texture*> sprite_sheets_;
+        TTF_Font* font;
 };
 
 #endif // GRAPHICS_H

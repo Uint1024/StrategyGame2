@@ -41,6 +41,7 @@ class Peasant : public GameObject
         int getMaxWood() const;
         int getNeededWood() const;
 
+
     protected:
     private:
         Point next_position_;
@@ -59,7 +60,7 @@ class Peasant : public GameObject
         ACTIVITY previous_activity_;
         int needed_wood_;
         int max_wood_;
-
+        OCCUPATION occupation_;
 };
 
 #endif // PEASANT_H

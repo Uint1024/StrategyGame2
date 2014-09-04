@@ -23,10 +23,12 @@ void Game::gameLoop()
     Dimension screen_dimension_in_tiles = config_.getScreenSize() / config_.getTileSize();
     Peasant peasant1{Point{20,20}};
     peasant1.setGoal(Point{10,10});
+
     std::vector<DIRECTION> direc = {UP, LEFT, UP_LEFT, UP, UP_RIGHT, RIGHT};
     //peasant1.setPathfinding(direc);
     npcs_list_.push_back(peasant1);
     selected_npc_ = &npcs_list_[0];
+    //std::cout << "in main, " << selected_npc_ << " " << &npcs_list_[0] << std::endl;
     start = {0,0};
     finish = {0,0};
     chrono_for_pathfinding_ = 0;
@@ -72,8 +74,9 @@ void Game::gameLoop()
 
 void Game::update(SDL_Event& event)
 {
-    inputs_.update();
-    inputs_.calculateMouseTravel(event);
+    //inputs_.calculateMouseTravel(event);
+
+
     while(SDL_PollEvent(&event))
     {
         switch(event.type)
@@ -107,11 +110,8 @@ void Game::update(SDL_Event& event)
         }
 
     }
+    inputs_.update(event);
 
-    if(inputs_.getHeldMouseButtons()[SDL_BUTTON_LEFT])
-        std::cout << "held left mouse button" << std::endl;
-    else
-        std::cout << "NOT held left mouse button" << std::endl;
 
     //mouse coordinates on the world map (NOT on the screen)
     Point mouse_coords = inputs_.getMouseCoordinatesInPixels() + graphics_.getCamera().getPosition();
@@ -176,6 +176,68 @@ void Game::update(SDL_Event& event)
             }
 
         }
+    }
+
+
+    if(inputs_.getHeldMouseButtons()[SDL_BUTTON_LEFT])
+    {
+        Point mouse_selection_start_coordinates_in_tiles = (inputs_.getMouseSelectionStart() -
+                                                        (inputs_.getMouseSelectionStart() % config_.getTileSize()))/ config_.getTileSize();
+        Point mouse_selection_end_coordinates_in_tiles = (inputs_.getMouseSelectionEnd() -
+                                                        (inputs_.getMouseSelectionEnd() % config_.getTileSize()))/ config_.getTileSize();
+
+        //difference in tiles
+        Point diff = mouse_selection_end_coordinates_in_tiles - mouse_selection_start_coordinates_in_tiles;
+
+        //position of the start and end of the selection from the up left corner to the bottom right corner
+        Point map_selection_start;
+        Point map_selection_end;
+
+       if(diff.x > 0 && diff.y > 0)
+        {
+            map_selection_start = mouse_selection_start_coordinates_in_tiles;
+            map_selection_end = mouse_selection_end_coordinates_in_tiles;
+        }
+
+        else if(diff.x > 0 && diff.y < 0)
+        {
+            map_selection_start = mouse_selection_start_coordinates_in_tiles + Point{0,diff.y};
+            map_selection_end = mouse_selection_start_coordinates_in_tiles + Point{diff.x, 0};
+        }
+        else if(diff.x < 0 && diff.y < 0)
+        {
+            map_selection_start = mouse_selection_start_coordinates_in_tiles + Point{diff.x,diff.y};
+            map_selection_end = mouse_selection_start_coordinates_in_tiles;
+        }
+        else if(diff.x < 0 && diff.y > 0)
+        {
+            map_selection_start = mouse_selection_start_coordinates_in_tiles + Point{diff.x,0};
+            map_selection_end = mouse_selection_start_coordinates_in_tiles + Point{0, diff.y};
+        }
+
+        if(diff.x != 0 && diff.y != 0)
+        {
+            for(int x = map_selection_start.x ; x <= map_selection_end.x ; x++)
+            {
+                for(int y = map_selection_start.y ; y <= map_selection_end.y ; y++)
+                {
+                    switch(current_selected_world_editor_object_)
+                    {
+                        case TREE:
+                            world_map_[1][y * config_.getMapSize().y + x] = std::make_shared<Tree>(Point{x,y});
+                            break;
+                        case STOCKPILE:
+                            world_map_[1][y * config_.getMapSize().y + x] = std::make_shared<Stockpile>(Point{x,y});
+                            break;
+                        case PLAINS:
+                            world_map_[0][y * config_.getMapSize().y + x] = std::make_shared<Plains>(Point{x,y});
+                            break;
+                    }
+
+                }
+            }
+        }
+
     }
 
     if(inputs_.getPressedKeys()[SDL_SCANCODE_X] || inputs_.getPressedMouseButtons()[SDL_BUTTON_MIDDLE])
@@ -284,9 +346,9 @@ void Game::draw(Graphics& graphics, Config& config)
     graphics_.clear();
     graphics_.drawTiles(config, world_map_, pathfinding_nodes_);
 
-    graphics_.drawNpcs(config_, npcs_list_);
+    graphics_.drawNpcs(config_, npcs_list_, selected_npc_);
     //graphics_.drawNodes(closed_nodes_map, open_nodes_map);
-
+    graphics_.drawInputs(inputs_);
     world_editor_->render(graphics_);
     graphics_.flip();
 }
